@@ -1,18 +1,4 @@
-"""
-COMP3506/7505 S2 2023
-The University of Queensland
-
-NOTE: This file will not be used for marking and is here to provide you with
-a simple way of testing your data structures. You may edit this file by adding
-your own test functionality.
-"""
-
-# Import helper libraries
-import argparse
-import sys
-import random
-
-# Import our new structures
+""" COMP3506/7505 S2 2023 The University of Queensland NOTE: This file will not be used for marking and is here to provide you with a simple way of testing your data structures. You may edit this file by adding your own test functionality. """ # Import helper libraries import argparse import sys import random Import our new structures
 from structures.entry import Entry
 from structures.dynamic_array import DynamicArray
 from structures.graph import Graph, LatticeGraph

@@ -8,6 +8,8 @@ from typing import Any
 from structures.entry import Entry
 from structures.dynamic_array import DynamicArray
 
+from math import log2, ceil
+
 class PriorityQueue:
     """
     An implementation of the PriorityQueue ADT. We have used the implicit
@@ -28,20 +30,35 @@ class PriorityQueue:
         self._arr = DynamicArray()  # insert O(n), removeMin/min O(1)
         self._max_priority = 0
 
+    def __str__(self) -> str:
+        out = "[ "
+        for i in range(self._arr.get_size()):
+                if self._arr[i] is None:
+                    break
+
+                out += f" {str(self._arr[i])} "
+
+        return out + "]"
+
     def _parent(self, ix: int) -> int:
         """
         Given index ix, return the index of the parent
         """
-        return (ix) // 2
+        if ix == 0:
+            return ix
+
+        return (ix - 1) // 2
 
     def insert(self, priority: int, data: Any) -> None:
         """
         Insert some data to the queue with a given priority.
         """
         new = Entry(priority, data)
+
         # Put it at the back of the heap
         self._arr.append(new)
         ix = self._arr.get_size() - 1
+
         # Now swap it upwards with its parent until heap order is restored
         while ix > 0 and self._arr[ix].get_key() < self._arr[self._parent(ix)].get_key():
             parent_ix = self._parent(ix)
@@ -63,6 +80,7 @@ class PriorityQueue:
         """
         if self.is_empty():
             return None
+
         return self._arr[0].get_key()
 
     def get_min_value(self) -> Any:
@@ -71,7 +89,8 @@ class PriorityQueue:
         """
         if self.is_empty():
             return None
-        return self._arr[0].get_key()
+
+        return self._arr[0].get_value()
 
     def remove_min(self) -> Any:
         """
@@ -80,28 +99,36 @@ class PriorityQueue:
         """
         if self.is_empty():
             return None
+
         result = self._arr[0]
         self._arr[0] = self._arr[self.get_size() - 1]
         self._arr.remove_at(self.get_size() - 1)
 
-        cur = 1
+        cur = 0
+        left = 1
+        right = 2
         while cur < self.get_size():
-            left = cur * 2
-            right = cur * 2 + 1
-
             smallest = cur
+
+            # cur = smallest
+            smallest = cur
+
+            # bug with this logic
             if left < self.get_size() and self._arr[smallest].get_key() > self._arr[left].get_key():
                 smallest = left
             if right < self.get_size() and self._arr[smallest].get_key() > self._arr[right].get_key():
                 smallest = right
-            if smallest != cur:
-                self._arr[cur], self._arr[smallest] = (
-                    self._arr[smallest],
-                    self._arr[cur],
-                )
+            elif smallest != cur:
+                self._arr[cur], self._arr[smallest] = self._arr[smallest], self._arr[cur]
                 cur = smallest
             else:
                 break
+
+            # fix the if else logic, something is wrong with it 4th bug
+
+            left = smallest * 2
+            right = smallest * 2 + 1 # this was the 3rd bug, 
+
         return result.get_value()
 
     def get_size(self) -> int:
@@ -124,6 +151,14 @@ class PriorityQueue:
         use the DynamicArray build_from_list function. You must use
         only O(1) extra space.
         """
+        # [9, 8, 7, 6, 5, 4, 3, 2, 1]
+        size = input_list.get_size()
+        level = ceil(log2(size))
+        
+        """
+        iterate backwards over array, check 2i+1 and 2i+2 (nodes kids), if in the array maintain
+        balance
+        """
 
     def sort(self) -> DynamicArray:
         """
@@ -136,4 +171,15 @@ class PriorityQueue:
         destroyed and will not be used again (hence returning the underlying
         array back to the caller).
         """
+        
+        """
+        to sort the priority queue do removeMin() and put at back of array
+
+        []
+
+        """
+        for idx in range(self._arr.get_size()):
+            val = self.remove_min()
+            self._arr[self.get_size() - idx]
+         
         return self._arr

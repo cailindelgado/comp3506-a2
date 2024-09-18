@@ -24,6 +24,9 @@ class Entry(Hashable):
         self._key = key
         self._value = value
 
+    def __str__(self) -> str:
+        return f"{self._key},{self._value}"
+
     def get_key(self) -> Any:
         return self._key
 

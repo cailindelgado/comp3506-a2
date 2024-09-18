@@ -33,7 +33,12 @@ class Map:
         You are free to make any changes you find suitable in this function
         to initialise your map.
         """
-        pass
+        self._sentinal = Entry(None, None)
+        self._resizing = [3, 5, 7, 11, 13, 17]
+        self._capacity = 3
+        self._table = [None] * 3
+        self._size = 0
+        self._loadf = self._size / self._capacity
 
     def insert(self, entry: Entry) -> Any | None:
         """
@@ -42,6 +47,7 @@ class Map:
         None otherwise. (We will not use None as a key or a value in our tests).
         Time complexity for full marks: O(1*)
         """
+        key = entry.get_key()
         pass
 
     def insert_kv(self, key: Any, value: Any) -> Any | None:
@@ -52,8 +58,8 @@ class Map:
         in mind. You can modify this if you want, as long as it behaves.
         Time complexity for full marks: O(1*)
         """
-        #hint: entry = Entry(key, value)
-        pass
+        entry = Entry(key, value)
+        self.insert(entry)
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """
@@ -62,7 +68,7 @@ class Map:
         anything. Can be used like: my_map[some_key] = some_value
         Time complexity for full marks: O(1*)
         """
-        pass
+        self.insert_kv(key, value)
 
     def remove(self, key: Any) -> None:
         """
@@ -86,16 +92,16 @@ class Map:
         for find()
         Time complexity for full marks: O(1*)
         """
-        pass
+        self.find(key)
 
     def get_size(self) -> int:
         """
         Time complexity for full marks: O(1)
         """
-        pass
+        return self._size
 
     def is_empty(self) -> bool:
         """
         Time complexity for full marks: O(1)
         """
-        pass
+        return self._size == 0

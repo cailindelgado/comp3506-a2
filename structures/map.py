@@ -18,6 +18,7 @@ Note that if you opt to not use hashing, then you can simply override the
 get_hash function to return -1 for example.
 """
 
+from random import randrange
 from typing import Any
 from structures.entry import Entry
 
@@ -34,11 +35,35 @@ class Map:
         to initialise your map.
         """
         self._sentinal = Entry(None, None)
-        self._resizing = [3, 5, 7, 11, 13, 17]
-        self._capacity = 3
-        self._table = [None] * 3
+        self._resizing = [5, 7, 11, 13, 17]  # prime numbers for rehashing
+        self._cur_size = 0
+        self._capacity = self._resizing[self._cur_size]
+        self._table = [None] * self._capacity
         self._size = 0
         self._loadf = self._size / self._capacity
+        self._chosen_func = randrange(0, 4)
+
+    def _rehash(self):
+        """
+        when self._loadf gets large enough it becomes time to 
+        rehash the table to maintain optminal functionality
+        """
+        pass
+
+    def 
+    def cyclic_hash(self, key: Any) -> int:
+        """
+        Given a key, spit out the value
+        """
+        mask = (1 << 32) - 1
+        hash = 0
+        key = f"{key}"
+        
+        for char in key:
+            hash = (hash << 5 & mask) | (hash >> 27) 
+            hash += ord(char)
+            
+        return hash
 
     def insert(self, entry: Entry) -> Any | None:
         """
@@ -47,6 +72,9 @@ class Map:
         None otherwise. (We will not use None as a key or a value in our tests).
         Time complexity for full marks: O(1*)
         """
+        if self.find(entry.get_key()) is not None:
+            return None
+
         key = entry.get_key()
         pass
 

@@ -105,15 +105,10 @@ class PriorityQueue:
         self._arr.remove_at(self.get_size() - 1)
 
         cur = 0
+        smallest = cur
         left = 1
         right = 2
         while cur < self.get_size():
-            smallest = cur
-
-            # cur = smallest
-            smallest = cur
-
-            # bug with this logic
             if left < self.get_size() and self._arr[smallest].get_key() > self._arr[left].get_key():
                 smallest = left
             if right < self.get_size() and self._arr[smallest].get_key() > self._arr[right].get_key():
@@ -124,10 +119,8 @@ class PriorityQueue:
             else:
                 break
 
-            # fix the if else logic, something is wrong with it 4th bug
-
             left = smallest * 2
-            right = smallest * 2 + 1 # this was the 3rd bug, 
+            right = smallest * 2 + 1
 
         return result.get_value()
 

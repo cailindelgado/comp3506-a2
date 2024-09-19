@@ -55,5 +55,8 @@ class TestPriorityQueue():
         print(priority_queue.get_size())
         print(priority_queue)
 
-        assert priority_queue.remove_min() == 6
-        # assert priority_queue.remove_min() == 7
+        assert priority_queue.remove_min() == 6  # min is 2, 6
+        assert priority_queue.remove_min() == 7  # min is 4, 7
+        assert priority_queue.remove_min() == 8  # min is 5, 8
+        assert priority_queue.remove_min() == 1  # min is 9, 1
+        assert priority_queue.remove_min() is None

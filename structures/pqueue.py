@@ -4,11 +4,9 @@ The University of Queensland
 Joel Mackenzie and Vladimir Morozov
 """
 
-from typing import Any
+from typing import Any, List
 from structures.entry import Entry
 from structures.dynamic_array import DynamicArray
-
-from math import log2, ceil
 
 class PriorityQueue:
     """
@@ -31,12 +29,13 @@ class PriorityQueue:
         self._max_priority = 0
 
     def __str__(self) -> str:
+        # return str(self._arr)
         out = "[ "
         for i in range(self._arr.get_size()):
                 if self._arr[i] is None:
                     break
 
-                out += f" {str(self._arr[i])} "
+                out += f" |{str(self._arr[i])}| "
 
         return out + "]"
 
@@ -101,28 +100,46 @@ class PriorityQueue:
             return None
 
         result = self._arr[0]
+        
+        if result is None:
+            return None
+
         self._arr[0] = self._arr[self.get_size() - 1]
         self._arr.remove_at(self.get_size() - 1)
 
-        cur = 0
-        smallest = cur
-        left = 1
-        right = 2
-        while cur < self.get_size():
-            if left < self.get_size() and self._arr[smallest].get_key() > self._arr[left].get_key():
-                smallest = left
-            if right < self.get_size() and self._arr[smallest].get_key() > self._arr[right].get_key():
-                smallest = right
-            elif smallest != cur:
-                self._arr[cur], self._arr[smallest] = self._arr[smallest], self._arr[cur]
-                cur = smallest
-            else:
-                break
-
-            left = smallest * 2
-            right = smallest * 2 + 1
+        # Heapify to maintain properties
+        self.heapify(self._arr, self._arr.get_size(), 0)
 
         return result.get_value()
+
+    def heapify(self, lst: DynamicArray | List, size: int, idx: int):
+        """
+        Goes down the heap to make sure that the heap property is being maintained
+        """
+        smallest = idx
+
+        while idx < size:
+            left = 2 * idx + 1
+            right = 2 * idx + 2
+
+            s = lst[smallest]
+            l = lst[left]
+            r = lst[right]
+
+            if left < size and (l is not None and s is not None): 
+                if s.get_key() > l.get_key():
+                    smallest = left
+
+            if right < size and (r is not None and s is not None):
+                if s.get_key() > r.get_key():
+                    smallest = right
+
+            if smallest != idx:
+                lst[idx], lst[smallest] = lst[smallest], lst[idx]
+                idx = smallest
+
+            else:
+                break
 
     def get_size(self) -> int:
         """
@@ -143,15 +160,41 @@ class PriorityQueue:
         inside the self._arr as a DynamicArray. You might like to
         use the DynamicArray build_from_list function. You must use
         only O(1) extra space.
+
+        [9, 8, 7, 6, 5, 4, 3, 2, 1, N, N, N]
         """
-        # [9, 8, 7, 6, 5, 4, 3, 2, 1]
-        size = input_list.get_size()
-        level = ceil(log2(size))
-        
-        """
-        iterate backwards over array, check 2i+1 and 2i+2 (nodes kids), if in the array maintain
-        balance
-        """
+
+        size = input_list.get_size() - 1 
+        l_node = (size // 2) - 1  # last non-leaf node is at n//2 -1
+
+        # want to maintian the order for the tree's
+        for idx in range(l_node, -1, -1):
+            smallest = idx
+
+            while idx < size:
+                left = 2 * idx + 1
+                right = 2 * idx + 2
+
+                s = input_list[smallest]
+                l = input_list[left]
+                r = input_list[right]
+
+                if left < size and (l is not None and s is not None): 
+                    if s > l:
+                        smallest = left
+
+                if right < size and (r is not None and s is not None):
+                    if s > r:
+                        smallest = right
+
+                if smallest != idx:
+                    input_list[idx], input_list[smallest] = input_list[smallest], input_list[idx]
+                    idx = smallest
+
+                else:
+                    break
+
+        self._arr = input_list
 
     def sort(self) -> DynamicArray:
         """
@@ -164,15 +207,8 @@ class PriorityQueue:
         destroyed and will not be used again (hence returning the underlying
         array back to the caller).
         """
-        
-        """
-        to sort the priority queue do removeMin() and put at back of array
-
-        []
-
-        """
         for idx in range(self._arr.get_size()):
             val = self.remove_min()
-            self._arr[self.get_size() - idx]
+            self._arr[self.get_size() - idx] = val
          
         return self._arr

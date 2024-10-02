@@ -1,0 +1,4 @@
+map prime numbers: https://planetmath.org/goodhashtableprimes
+finding prime numbers for MAD hash: https://www.numberempire.com/primenumbers.php
+
+

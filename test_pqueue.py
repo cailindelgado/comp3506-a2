@@ -6,6 +6,7 @@ import pytest
 
 # Importing structures
 from structures.pqueue import PriorityQueue
+from structures.dynamic_array import DynamicArray
 
 class TestPriorityQueue():
 
@@ -60,3 +61,26 @@ class TestPriorityQueue():
         assert priority_queue.remove_min() == 8  # min is 5, 8
         assert priority_queue.remove_min() == 1  # min is 9, 1
         assert priority_queue.remove_min() is None
+
+    def test_ip_build(self, priority_queue):
+        # setup for the dynamic array
+        da = DynamicArray()
+        da.append(6)
+        da.append(9)
+        da.append(4)
+        da.append(3)
+        da.append(5)
+        da.append(2)
+        da.append(1)
+
+        # assert  1 == 2
+
+        priority_queue.ip_build(da)
+        print(priority_queue)
+        print(da)
+        # priority_queue.sort()
+        # assert  1 == 2
+        for i in range(5):
+            assert priority_queue._arr[i] < priority_queue._arr[i + 1]
+
+

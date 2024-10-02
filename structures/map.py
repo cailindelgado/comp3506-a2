@@ -34,36 +34,49 @@ class Map:
         You are free to make any changes you find suitable in this function
         to initialise your map.
         """
-        self._sentinal = Entry(None, None)
-        self._resizing = [5, 7, 11, 13, 17]  # prime numbers for rehashing
-        self._cur_size = 0
-        self._capacity = self._resizing[self._cur_size]
+        self._sentinal = Entry(None, None)  # for when doing quadratic probing
+
+        self._resizing = [53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 
+                          98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 
+                          25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 
+                          1610612741, 4294967311]  # resizing primes
+
+        # index to resize too
+        self._resize_idx = 0
+        self._capacity = self._resizing[self._resize_idx]
+
+        # 5 primes > 2^32
+        self._p_list = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
+
+        self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
+        self._b = randrange(self._p_list[self._resize_idx % 5])  # b in [0, prime]
+
         self._table = [None] * self._capacity
         self._size = 0
-        self._loadf = self._size / self._capacity
-        self._chosen_func = randrange(0, 4)
 
     def _rehash(self):
         """
         when self._loadf gets large enough it becomes time to 
         rehash the table to maintain optminal functionality
         """
-        pass
+        self._resize_idx += 1
 
-    def 
-    def cyclic_hash(self, key: Any) -> int:
-        """
-        Given a key, spit out the value
-        """
-        mask = (1 << 32) - 1
-        hash = 0
-        key = f"{key}"
-        
-        for char in key:
-            hash = (hash << 5 & mask) | (hash >> 27) 
-            hash += ord(char)
+        if self._resize_idx > 25:
+            self._resize_idx += 1
             
-        return hash
+        # rehash the table
+        self._capacity = self._resizing[self._resize_idx]
+
+
+    def _get_index(self, entry: Entry) -> int:
+        """
+        Gets the place in the array from the given index
+        """
+        hash_key = entry.get_hash()
+        N = self._capacity
+        prime = self._p_list[self._resize_idx % 5]
+
+        return ((self._a * hash_key + self._b) % prime) % N
 
     def insert(self, entry: Entry) -> Any | None:
         """

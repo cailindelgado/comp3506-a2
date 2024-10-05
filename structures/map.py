@@ -18,6 +18,7 @@ Note that if you opt to not use hashing, then you can simply override the
 get_hash function to return -1 for example.
 """
 
+from random import randrange
 from typing import Any
 from structures.entry import Entry
 
@@ -26,6 +27,7 @@ class Map:
     An implementation of the Map ADT.
     The provided methods consume keys and values via the Entry type.
     """
+    SENTINAL = -1  # for when doing quadratic probing
 
     def __init__(self) -> None:
         """
@@ -33,7 +35,60 @@ class Map:
         You are free to make any changes you find suitable in this function
         to initialise your map.
         """
-        pass
+        self._resizing = [53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741, 4294967311]  # resizing primes
+
+        # 5 primes > 2^32
+        self._p_list = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
+
+        # index to resize too
+        self._resize_idx = 0
+        self._capacity = self._resizing[self._resize_idx]
+
+        self._a = randrange(1, self._p_list[self._resize_idx])  # a in [1, prime]
+        self._b = randrange(self._p_list[self._resize_idx])  # b in [0, prime]
+
+        self._table = [None] * self._capacity
+        self._size = 0
+
+        self._loadf = self._size / self._capacity
+
+    def _get_index(self, entry: Entry) -> int:
+        """
+        Gets the index in the hashmap array for a given entry key
+        """
+        hash_key = entry.get_hash()
+        N = self._capacity
+        prime = self._p_list[self._resize_idx % 5]
+
+        return ((self._a * hash_key + self._b) % prime) % N
+
+    def _rehash(self):
+        """
+        when self._loadf gets large enough it becomes time to 
+        rehash the table to maintain optminal functionality
+        """
+        self._resize_idx += 1
+        old_cap = self._capacity
+
+        if self._resize_idx >= 26:
+            self._capacity = self._resizing[26]
+        else:
+            self._capacity = self._resizing[self._resize_idx]
+
+        # rehash the table
+        newT = [None] * self._capacity
+        for idx in range(old_cap):
+            elem = self._table[idx]
+            if isinstance(elem, Entry):
+                newT[self._get_index(elem)] = elem
+
+        self._table = newT
+
+        self._loadf = self._size / self._capacity
+
+        # recalculate the a and b values for hashing
+        self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
+        self._b = randrange(self._p_list[self._resize_idx % 5])  # b in [0, prime]
 
     def insert(self, entry: Entry) -> Any | None:
         """
@@ -42,7 +97,19 @@ class Map:
         None otherwise. (We will not use None as a key or a value in our tests).
         Time complexity for full marks: O(1*)
         """
-        pass
+        idx = self._find(entry.get_key())
+
+        if idx is None:
+            self._table[self._get_index(entry)] = entry
+            self._size += 1
+            self._loadf = self._size / self._capacity
+            return None
+
+        # if index, then update val and return old val
+        if isinstance(self._table[idx], Entry):
+            out_val = self._table[idx].get_value()
+            self._table[idx].update_value(entry.get_value())
+            return out_val
 
     def insert_kv(self, key: Any, value: Any) -> Any | None:
         """
@@ -52,8 +119,8 @@ class Map:
         in mind. You can modify this if you want, as long as it behaves.
         Time complexity for full marks: O(1*)
         """
-        #hint: entry = Entry(key, value)
-        pass
+        entry = Entry(key, value)
+        self.insert(entry)
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """
@@ -62,7 +129,7 @@ class Map:
         anything. Can be used like: my_map[some_key] = some_value
         Time complexity for full marks: O(1*)
         """
-        pass
+        self.insert_kv(key, value)
 
     def remove(self, key: Any) -> None:
         """
@@ -70,7 +137,41 @@ class Map:
         data structure. Don't return anything.
         Time complexity for full marks: O(1*)
         """
-        pass
+        idx = self._find(key)
+
+        if idx is None:
+            return None
+
+        #idx is not none, so key exists in ADT
+        self._table[idx] = self.SENTINAL
+
+    def _find(self, key: Any) -> int | None:
+        """
+        like @self.find@ but returns the idx rather than the value, if 
+        the index of the element is found, 
+        """
+        if self._loadf >  0.8:
+            self._rehash()
+
+        entry = Entry(key, value=None)
+        probe_idx = self._get_index(entry)
+        counter = 0
+        N = self._capacity
+
+        while counter != N:
+            elem = self._table[probe_idx]
+
+            if elem is None:
+                return None
+
+            elif elem.get_key() == key:
+                return probe_idx
+            
+            else:
+                probe_idx = (probe_idx + (probe_idx ** 2)) % N
+                counter += 1
+
+        return None
 
     def find(self, key: Any) -> Any | None:
         """
@@ -78,7 +179,29 @@ class Map:
         exists; return None otherwise.
         Time complexity for full marks: O(1*)
         """
-        pass
+        if self._loadf > 0.8:
+            self._rehash()
+
+        # doing the most quadratic of probing 
+        entry = Entry(key, value=None)
+        probe_idx = self._get_index(entry)
+        counter = 0
+        N = self._capacity
+
+        while counter != N:
+            elem = self._table[probe_idx]
+
+            if elem is None:  # if the element is none or a sentinal val
+                return None
+
+            elif elem.get_key() == key:
+                return elem.get_value()
+
+            else:
+                probe_idx = (probe_idx + (probe_idx ** 2)) % N
+                counter += 1
+
+        return None
 
     def __getitem__(self, key: Any) -> Any | None:
         """
@@ -86,16 +209,16 @@ class Map:
         for find()
         Time complexity for full marks: O(1*)
         """
-        pass
+        self.find(key)
 
     def get_size(self) -> int:
         """
         Time complexity for full marks: O(1)
         """
-        pass
+        return self._size
 
     def is_empty(self) -> bool:
         """
         Time complexity for full marks: O(1)
         """
-        pass
+        return self._size == 0

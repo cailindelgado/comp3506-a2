@@ -5,7 +5,9 @@ Joel Mackenzie and Vladimir Morozov
 """
 
 from typing import Any
+
 from structures.util import Hashable
+from structures.util import object_to_byte_array as oba
 
 class Entry(Hashable):
     """
@@ -70,6 +72,15 @@ class Entry(Hashable):
         assignment, your universe could be something like integers in
         [0, 2^32-1].
         """
+        key = oba(self._key)
+        mask = (1 << 32) - 1
+        hash = 0
+        
+        for char in key:
+            hash = (hash << 5 & mask) | (hash >> 27) 
+            hash += ord(char)
+            
+        return hash
 
 class Compound:
     """

@@ -27,6 +27,7 @@ class Map:
     An implementation of the Map ADT.
     The provided methods consume keys and values via the Entry type.
     """
+    SENTINAL = -1  # for when doing quadratic probing
 
     def __init__(self) -> None:
         """
@@ -34,12 +35,7 @@ class Map:
         You are free to make any changes you find suitable in this function
         to initialise your map.
         """
-        self._sentinal = -1  # for when doing quadratic probing
-
-        self._resizing = [53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 
-                          98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 
-                          25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 
-                          1610612741, 4294967311]  # resizing primes
+        self._resizing = [53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741, 4294967311]  # resizing primes
 
         # 5 primes > 2^32
         self._p_list = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
@@ -48,27 +44,13 @@ class Map:
         self._resize_idx = 0
         self._capacity = self._resizing[self._resize_idx]
 
-        self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
-        self._b = randrange(self._p_list[self._resize_idx % 5])  # b in [0, prime]
+        self._a = randrange(1, self._p_list[self._resize_idx])  # a in [1, prime]
+        self._b = randrange(self._p_list[self._resize_idx])  # b in [0, prime]
 
-        self._table = [None for _ in range(self._capacity)]
         self._table = [None] * self._capacity
         self._size = 0
 
-    def _rehash(self):
-        """
-        when self._loadf gets large enough it becomes time to 
-        rehash the table to maintain optminal functionality
-        """
-        self._resize_idx += 1
-
-        if self._resize_idx > 25:
-            self._resize_idx += 1
-            
-        # rehash the table
-        self._capacity = self._resizing[self._resize_idx]
-        self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
-        self._b = randrange(self._p_list[self._resize_idx % 5])  # b in [0, prime]
+        self._loadf = self._size / self._capacity
 
     def _get_index(self, entry: Entry) -> int:
         """
@@ -79,6 +61,34 @@ class Map:
         prime = self._p_list[self._resize_idx % 5]
 
         return ((self._a * hash_key + self._b) % prime) % N
+
+    def _rehash(self):
+        """
+        when self._loadf gets large enough it becomes time to 
+        rehash the table to maintain optminal functionality
+        """
+        self._resize_idx += 1
+        old_cap = self._capacity
+
+        if self._resize_idx >= 26:
+            self._capacity = self._resizing[26]
+        else:
+            self._capacity = self._resizing[self._resize_idx]
+
+        # rehash the table
+        newT = [None] * self._capacity
+        for idx in range(old_cap):
+            elem = self._table[idx]
+            if isinstance(elem, Entry):
+                newT[self._get_index(elem)] = elem
+
+        self._table = newT
+
+        self._loadf = self._size / self._capacity
+
+        # recalculate the a and b values for hashing
+        self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
+        self._b = randrange(self._p_list[self._resize_idx % 5])  # b in [0, prime]
 
     def insert(self, entry: Entry) -> Any | None:
         """
@@ -92,6 +102,7 @@ class Map:
         if idx is None:
             self._table[self._get_index(entry)] = entry
             self._size += 1
+            self._loadf = self._size / self._capacity
             return None
 
         # if index, then update val and return old val
@@ -132,13 +143,16 @@ class Map:
             return None
 
         #idx is not none, so key exists in ADT
-        self._table[idx] = self._sentinal 
+        self._table[idx] = self.SENTINAL
 
     def _find(self, key: Any) -> int | None:
         """
         like @self.find@ but returns the idx rather than the value, if 
         the index of the element is found, 
         """
+        if self._loadf >  0.8:
+            self._rehash()
+
         entry = Entry(key, value=None)
         probe_idx = self._get_index(entry)
         counter = 0
@@ -165,6 +179,9 @@ class Map:
         exists; return None otherwise.
         Time complexity for full marks: O(1*)
         """
+        if self._loadf > 0.8:
+            self._rehash()
+
         # doing the most quadratic of probing 
         entry = Entry(key, value=None)
         probe_idx = self._get_index(entry)

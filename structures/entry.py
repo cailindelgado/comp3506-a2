@@ -76,9 +76,9 @@ class Entry(Hashable):
         mask = (1 << 32) - 1
         hash = 0
         
-        for char in key:
+        for byte in key:
             hash = (hash << 5 & mask) | (hash >> 27) 
-            hash += ord(char)
+            hash += byte
             
         return hash
 

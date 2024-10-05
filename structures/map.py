@@ -91,6 +91,7 @@ class Map:
 
         if idx is None:
             self._table[self._get_index(entry)] = entry
+            self._size += 1
             return None
 
         # if index, then update val and return old val

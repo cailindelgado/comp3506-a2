@@ -169,17 +169,10 @@ class PriorityQueue:
         destroyed and will not be used again (hence returning the underlying
         array back to the caller).
         """
-        # size = self.get_size()
-        # for idx in reversed(range(size)):
-        #     self._arr[0], self._arr[idx] = self._arr[idx], self._arr[0]
-
-
         size = self.get_size()
         n_size = size
-
         for idx in reversed(range(size)):
             self._arr[0], self._arr[idx] = self._arr[idx], self._arr[0]
-            print(self._arr)
 
             n_size -= 1
             cur = 0

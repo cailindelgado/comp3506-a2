@@ -1,7 +1,4 @@
 # Helper libraries
-import argparse
-import sys
-import random
 import pytest
 
 # Importing structures
@@ -62,6 +59,7 @@ class TestPriorityQueue():
         assert priority_queue.remove_min() == 1  # min is 9, 1
         assert priority_queue.remove_min() is None
 
+    # @pytest.mark.skip("womp womp")
     def test_ip_build(self, priority_queue):
         # setup for the dynamic array
         da = DynamicArray()
@@ -73,14 +71,25 @@ class TestPriorityQueue():
         da.append(2)
         da.append(1)
 
-        # assert  1 == 2
-
         priority_queue.ip_build(da)
         print(priority_queue)
         print(da)
         # priority_queue.sort()
-        # assert  1 == 2
-        for i in range(5):
-            assert priority_queue._arr[i] < priority_queue._arr[i + 1]
+        assert  1 == 2
 
+    def test_heapSort(self, priority_queue: PriorityQueue):
+        priority_queue.insert_fifo(9)
+        priority_queue.insert_fifo(5)
+        priority_queue.insert_fifo(6)
+        priority_queue.insert_fifo(8)
+        priority_queue.insert_fifo(3)
+        priority_queue.insert_fifo(4)
+        priority_queue.insert_fifo(2)
+        priority_queue.insert_fifo(3)
+        priority_queue.insert_fifo(1)
+
+        sorted = priority_queue.sort()
+        print(sorted)
+
+        assert 1 == 2
 

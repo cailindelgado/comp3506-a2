@@ -5,7 +5,6 @@ Joel Mackenzie and Vladimir Morozov
 """
 
 from typing import Any
-from collections.abc import Iterator
 from random import randint
 
 class DynamicArray:
@@ -26,9 +25,10 @@ class DynamicArray:
         via the str() method.
         """
         string_rep = "["
-        for elem in self._data:
+        for elem in range(self._size):
             string_rep += str(elem) + ", "
-        string_rep += "]"
+
+        string_rep = string_rep[:-2] + "]"
         return string_rep
 
     def __resize(self) -> None:

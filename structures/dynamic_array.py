@@ -25,8 +25,8 @@ class DynamicArray:
         via the str() method.
         """
         string_rep = "["
-        for elem in range(self._size):
-            string_rep += str(elem) + ", "
+        for idx in range(self._size):
+            string_rep += str(self._data[idx]) + ", "
 
         string_rep = string_rep[:-2] + "]"
         return string_rep

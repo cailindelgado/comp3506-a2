@@ -1,9 +1,13 @@
 # Helper libraries
+import random
+from random import randrange
+
 import pytest
 
 # Importing structures
 from structures.pqueue import PriorityQueue
 from structures.dynamic_array import DynamicArray
+from structures.entry import Entry
 
 class TestPriorityQueue():
 
@@ -61,35 +65,46 @@ class TestPriorityQueue():
 
     # @pytest.mark.skip("womp womp")
     def test_ip_build(self, priority_queue):
-        # setup for the dynamic array
+        random.seed(20)
+        VAL = 10
         da = DynamicArray()
-        da.append(6)
-        da.append(9)
-        da.append(4)
-        da.append(3)
-        da.append(5)
-        da.append(2)
-        da.append(1)
+        inserted = "["
+        for i in range(VAL):
+            x = randrange(VAL)
+            da.append(Entry(x, x))
+            inserted += f'{x}, '
+
+        inserted = inserted[:-2] + "]"
 
         priority_queue.ip_build(da)
+        print(inserted)
         print(priority_queue)
-        print(da)
-        # priority_queue.sort()
-        assert  1 == 2
+
+        assert priority_queue.remove_min() == 0
+
+        # lst = priority_queue._arr
+        # for i in range(VAL):
+        #     l = 2*i + 1
+        #     r = 2*i + 2
+        #
+        #     if l < VAL and r < VAL:
+        #         assert lst[i] <= lst[l] and lst[i] <= lst[r]
+        #     elif l < VAL <= r:
+        #         assert lst[i] <= lst[l]
+        #     elif l >= VAL > r:
+        #         assert lst[i] <= lst[r]
+
 
     def test_heapSort(self, priority_queue: PriorityQueue):
-        priority_queue.insert_fifo(9)
-        priority_queue.insert_fifo(5)
-        priority_queue.insert_fifo(6)
-        priority_queue.insert_fifo(8)
-        priority_queue.insert_fifo(3)
-        priority_queue.insert_fifo(4)
-        priority_queue.insert_fifo(2)
-        priority_queue.insert_fifo(3)
-        priority_queue.insert_fifo(1)
+        # random.seed(20)
+        VAL = 20
+        for i in range(VAL):
+            x = randrange(VAL)
+            priority_queue.insert_fifo(x)
 
         sorted = priority_queue.sort()
         print(sorted)
+        # assert 1 == 2
 
-        assert 1 == 2
-
+        for i in range(sorted.get_size() - 1):
+            assert sorted[i].get_value() > sorted[i + 1].get_value()

@@ -3,17 +3,17 @@ import random
 import pytest
 
 # Importing structures
-from structures.map import Map as m
+from structures.map import Map
 from structures.entry import Entry
 
 class TestMap():
 
     @pytest.fixture
     def map(self):
-        return m()
+        return Map()
 
     # @pytest.mark.skip("check")
-    def test_setUp(self, map: m):
+    def test_setUp(self, map: Map):
         assert map.SENTINAL == -1
         assert map._resize_idx == 0
         assert map._capacity == 53
@@ -21,7 +21,7 @@ class TestMap():
         assert map._size == 0
         assert map._loadf == 0
 
-    def test_index_yoinking(self, map):
+    def test_index_yoinking(self, map: Map):
         e1 = Entry(1, "a")
         e2 = Entry(2, "a")
         e3 = Entry(3, "a")
@@ -40,7 +40,7 @@ class TestMap():
         assert map.get_size() == 6
         assert map.find(5)
 
-    def test_given(self, map):
+    def test_given(self, map: Map):
         random.seed(1337)
         print("==== Executing Map Tests ====")
 
@@ -53,11 +53,14 @@ class TestMap():
         map[3] = "value_for_key_3"
         assert map.get_size() == 4
 
-    def test_rehash(self, map):
+    def test_halfFull(self, map: Map):
+        pass
+
+    def test_rehash(self, map: Map):
         for i in range(60):
             map.insert(Entry(i, "a"))
 
         assert map.get_size() == 60
         assert map._capacity == 97
-
-
+        
+    

@@ -156,8 +156,6 @@ class PriorityQueue:
         inside the self._arr as a DynamicArray. You might like to
         use the DynamicArray build_from_list function. You must use
         only O(1) extra space.
-
-        [9, 8, 7, 6, 5, 4, 3, 2, 1, N, N, N]
         """
         n = input_list.get_size()
         idx = 1
@@ -167,7 +165,7 @@ class PriorityQueue:
             current_val = input_list[idx]
 
             if parent_val is not None and current_val is not None:  # if both exist, swap and recheck
-                if parent_val > current_val:
+                if parent_val.get_key() > current_val.get_key():
                     input_list[idx], input_list[parent] = input_list[parent], input_list[idx]
                     idx = parent
                     continue
@@ -191,31 +189,27 @@ class PriorityQueue:
         for idx in range(size):
             self._arr[0], self._arr[n_size - 1] = self._arr[n_size - 1], self._arr[0]
 
+            # Heapify to maintain properties
             indx = 0
-            smallest = idx
+            smallest = indx
+            n_size -= 1
             while indx < n_size:
                 left = 2 * indx + 1
                 right = 2 * indx + 2
-
                 s = self._arr[smallest]
                 l = self._arr[left]
                 r = self._arr[right]
 
-                if left < n_size and (l is not None and s is not None): 
+                if left < n_size and (l is not None and s is not None):
                     if s.get_key() > l.get_key():
                         smallest = left
-
                 if right < n_size and (r is not None and s is not None):
                     if s.get_key() > r.get_key():
                         smallest = right
-
                 if smallest != indx:
                     self._arr[indx], self._arr[smallest] = self._arr[smallest], self._arr[indx]
                     indx = smallest
-
                 else:
                     break
-
-            n_size -= 1
 
         return self._arr

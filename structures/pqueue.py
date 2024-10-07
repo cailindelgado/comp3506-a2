@@ -100,39 +100,24 @@ class PriorityQueue:
             return None
 
         result = self._arr[0]
-        
-        if result is None:
-            return None
-
         self._arr[0] = self._arr[self.get_size() - 1]
         self._arr.remove_at(self.get_size() - 1)
 
         # Heapify to maintain properties
-        idx = 0
-        smallest = idx
-        size = self._arr.get_size()
+        cur = 0
+        while cur < self.get_size():
+            left = cur * 2 + 1
+            right = cur * 2 + 2
 
-        while idx < size:
-            left = 2 * idx + 1
-            right = 2 * idx + 2
-
-            s = self._arr[smallest]
-            l = self._arr[left]
-            r = self._arr[right]
-
-            if left < size and (l is not None and s is not None): 
-                if s.get_key() > l.get_key():
-                    smallest = left
-
-            if right < size and (r is not None and s is not None):
-                if s.get_key() > r.get_key():
-                    smallest = right
-
-            if smallest != idx:
-                self._arr[idx], self._arr[smallest] = self._arr[smallest], self._arr[idx]
-                idx = smallest
-
-            else:
+            smallest = cur
+            if left < self.get_size() and self._arr[smallest].get_key() > self._arr[left].get_key():
+                smallest = left
+            if right < self.get_size() and self._arr[smallest].get_key() > self._arr[right].get_key():
+                smallest = right
+            if smallest != cur:
+                self._arr[cur], self._arr[smallest] = self._arr[smallest], self._arr[cur]
+                cur = smallest
+            else: 
                 break
 
         return result.get_value()
@@ -165,7 +150,7 @@ class PriorityQueue:
             current_val = input_list[idx]
 
             if parent_val is not None and current_val is not None:  # if both exist, swap and recheck
-                if parent_val.get_key() > current_val.get_key():
+                if parent_val > current_val:
                     input_list[idx], input_list[parent] = input_list[parent], input_list[idx]
                     idx = parent
                     continue
@@ -184,32 +169,33 @@ class PriorityQueue:
         destroyed and will not be used again (hence returning the underlying
         array back to the caller).
         """
+        # size = self.get_size()
+        # for idx in reversed(range(size)):
+        #     self._arr[0], self._arr[idx] = self._arr[idx], self._arr[0]
+
+
         size = self.get_size()
         n_size = size
-        for idx in range(size):
-            self._arr[0], self._arr[n_size - 1] = self._arr[n_size - 1], self._arr[0]
 
-            # Heapify to maintain properties
-            indx = 0
-            smallest = indx
+        for idx in reversed(range(size)):
+            self._arr[0], self._arr[idx] = self._arr[idx], self._arr[0]
+            print(self._arr)
+
             n_size -= 1
-            while indx < n_size:
-                left = 2 * indx + 1
-                right = 2 * indx + 2
-                s = self._arr[smallest]
-                l = self._arr[left]
-                r = self._arr[right]
+            cur = 0
+            while cur < n_size:
+                left = cur * 2 + 1
+                right = cur * 2 + 2
 
-                if left < n_size and (l is not None and s is not None):
-                    if s.get_key() > l.get_key():
-                        smallest = left
-                if right < n_size and (r is not None and s is not None):
-                    if s.get_key() > r.get_key():
-                        smallest = right
-                if smallest != indx:
-                    self._arr[indx], self._arr[smallest] = self._arr[smallest], self._arr[indx]
-                    indx = smallest
-                else:
+                smallest = cur
+                if left < n_size and self._arr[smallest].get_key() > self._arr[left].get_key():
+                    smallest = left
+                if right < n_size and self._arr[smallest].get_key() > self._arr[right].get_key():
+                    smallest = right
+                if smallest != cur:
+                    self._arr[cur], self._arr[smallest] = self._arr[smallest], self._arr[cur]
+                    cur = smallest
+                else: 
                     break
 
         return self._arr

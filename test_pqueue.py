@@ -96,15 +96,24 @@ class TestPriorityQueue():
 
 
     def test_heapSort(self, priority_queue: PriorityQueue):
-        # random.seed(20)
-        VAL = 20
+        random.seed(20)
+        VAL = 10
+        lst = [0] * VAL
         for i in range(VAL):
-            x = randrange(VAL)
-            priority_queue.insert_fifo(x)
+            lst[i] = i
+            # x = randrange(VAL)
+            # priority_queue.insert(x, i)
 
-        sorted = priority_queue.sort()
+        random.shuffle(lst)
+
+        for i in range(VAL):
+            priority_queue.insert(lst[i], i)
+
+        sorted = priority_queue.sort() 
         print(sorted)
-        # assert 1 == 2
 
         for i in range(sorted.get_size() - 1):
-            assert sorted[i].get_value() > sorted[i + 1].get_value()
+            # print(sorted[i].get_key())
+            assert sorted[i].get_key() > sorted[i + 1].get_key()
+
+        assert 1 == 2

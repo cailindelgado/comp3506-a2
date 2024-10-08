@@ -33,6 +33,8 @@ class BloomFilter:
 
     def __init__(self, max_keys: int) -> None:
         # You should use max_keys to decide how many bits your bitvector
+        # use formula on ed discussion for number of bits: -max_keys * ln(0.01)/(ln(2)^2)
+
         # should have, and allocate it accordingly.
         self._data = BitVector()
         

@@ -40,7 +40,7 @@ class TestMap():
         assert map.get_size() == 6
         assert map.find(5)
 
-    def test_given(self, map: Map):
+    def test_given(self, map: Map):  # testing the given code
         random.seed(1337)
         print("==== Executing Map Tests ====")
 
@@ -50,12 +50,32 @@ class TestMap():
         map.insert(e1)
         map.insert(e2)
         map.insert_kv(2, "Barry rules")
+        assert map.insert(Entry(1, "value_for_key_10")) == "value_for_key_1"
+
         map[3] = "value_for_key_3"
         assert map.get_size() == 4
 
+    # testing to see if functionality works while half-full
     def test_halfFull(self, map: Map):
-        pass
+        VAL = 26
 
+        for i in range(VAL):
+            map.insert(Entry(i, f"{i}"))
+
+        assert map.get_size() == VAL
+        assert map._capacity == 53
+
+        # check that all the values exist within the map
+        for i in range(VAL + 1):
+            if i < VAL:
+                assert map.find(i) == f"{i}"
+            else:
+                assert map.find(i) == None
+
+        for i in range(VAL):
+            pass
+
+    # testing to see if rehashing works
     def test_rehash(self, map: Map):
         for i in range(60):
             map.insert(Entry(i, "a"))

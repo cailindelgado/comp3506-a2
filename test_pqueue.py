@@ -96,8 +96,8 @@ class TestPriorityQueue():
 
 
     def test_heapSort(self, priority_queue: PriorityQueue):
-        random.seed(20)
-        VAL = 10
+        # random.seed(20)
+        VAL = 100
         lst = [0] * VAL
         for i in range(VAL):
             lst[i] = i
@@ -116,4 +116,4 @@ class TestPriorityQueue():
             # print(sorted[i].get_key())
             assert sorted[i].get_key() > sorted[i + 1].get_key()
 
-        assert 1 == 2
+        # assert 1 == 2

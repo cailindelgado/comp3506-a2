@@ -83,4 +83,46 @@ class TestMap():
         assert map.get_size() == 60
         assert map._capacity == 97
         
-    
+    def test_insert_and_find(self, map: Map):
+        entry = Entry("key1", "value1")
+        map.insert(entry)
+        assert map.find("key1") == "value1"
+
+    def test_insert_kv_and_find(self, map: Map):
+        map.insert_kv("key2", "value2")
+        assert map.find("key2") == "value2"
+
+    def test_insert_and_update(self, map: Map):
+        entry1 = Entry("key3", "value3")
+        entry2 = Entry("key3", "value3_updated")
+        map.insert(entry1)
+        old_value = map.insert(entry2)
+        assert old_value == "value3"
+        assert map.find("key3") == "value3_updated"
+
+    # @pytest.mark.skip("inf loop smth going on")
+    def test_remove(self, map: Map):
+        print("pp")
+        map.insert_kv("key4", "value4")
+        map.remove("key4")
+        assert map.find("key4") is None
+
+    def test_setitem(self, map: Map):
+        map["key5"] = "value5"
+        assert map.find("key5") == "value5"
+
+    def test_rehash_2(self, map: Map):
+        for i in range(100):
+            map.insert_kv(f"key{i}", f"value{i}")
+        assert map._capacity > 53  # Initial capacity is 53, should be rehashed to a larger size
+
+    def test_find_nonexistent_key(self, map: Map):
+        assert map.find("nonexistent_key") is None
+
+    # @pytest.mark.skip("ditto remove test reason")
+    def test_insert_and_remove_multiple(self, map: Map):
+        map.insert_kv("key6", "value6")
+        map.insert_kv("key7", "value7")
+        map.remove("key6")
+        assert map.find("key6") is None
+        assert map.find("key7") == "value7"

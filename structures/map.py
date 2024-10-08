@@ -211,7 +211,7 @@ class Map:
         for find()
         Time complexity for full marks: O(1*)
         """
-        self.find(key)
+        return self.find(key)
 
     def get_size(self) -> int:
         """

@@ -123,7 +123,7 @@ class Map:
         Time complexity for full marks: O(1*)
         """
         entry = Entry(key, value)
-        self.insert(entry)
+        return self.insert(entry)
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """

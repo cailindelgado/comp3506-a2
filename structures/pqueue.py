@@ -171,7 +171,7 @@ class PriorityQueue:
         """
         size = self.get_size()
         n_size = size
-        for idx in reversed(range(size)):
+        for idx in range(size -1, -1, -1):
             self._arr[0], self._arr[idx] = self._arr[idx], self._arr[0]
 
             n_size -= 1

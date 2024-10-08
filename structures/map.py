@@ -35,10 +35,11 @@ class Map:
         You are free to make any changes you find suitable in this function
         to initialise your map.
         """
+        # resizing primes
         self._resizing = [53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 
                           196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 
                           50331653, 100663319, 201326611, 402653189, 805306457, 1610612741, 
-                          4294967311]  # resizing primes
+                          4294967311]  
 
         # 5 primes > 2^32
         self._p_list = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
@@ -46,14 +47,12 @@ class Map:
         # index to resize too
         self._resize_idx = 0
         self._capacity = self._resizing[self._resize_idx]
-
         self._a = randrange(1, self._p_list[self._resize_idx])  # a in [1, prime]
         self._b = randrange(self._p_list[self._resize_idx])  # b in [0, prime]
-
         self._table = [None] * self._capacity
         self._size = 0
-
-        self._loadf = self._size / self._capacity
+        self._loadf = 0.0
+        self._active_size = 0
 
     def _get_index(self, entry: Entry) -> int:
         """
@@ -86,7 +85,6 @@ class Map:
                 newT[self._get_index(elem)] = elem
 
         self._table = newT
-
         self._loadf = self._size / self._capacity
 
         # recalculate the a and b values for hashing
@@ -100,11 +98,31 @@ class Map:
         None otherwise. (We will not use None as a key or a value in our tests).
         Time complexity for full marks: O(1*)
         """
-        idx = self._find(entry.get_key())
+        if self._loadf >  0.8:
+            self._rehash()
 
-        if idx is None:
-            self._table[self._get_index(entry)] = entry
+        idx = -1
+        probe_idx = self._get_index(entry)
+        counter = 1
+        N = self._capacity
+
+        while counter != N:
+            elem = self._table[probe_idx]
+
+            if elem is None or elem.get_key() == entry.get_key(): 
+                idx = probe_idx
+                break
+            else:
+                probe_idx = (probe_idx + (counter ** 2)) % N
+                counter += 1
+
+        if idx == -1:
+            return None
+
+        if self._table[idx] is None:
+            self._table[idx] = entry
             self._size += 1
+            self._active_size += 1
             self._loadf = self._size / self._capacity
             return None
 
@@ -140,41 +158,28 @@ class Map:
         data structure. Don't return anything.
         Time complexity for full marks: O(1*)
         """
-        idx = self._find(key)
-
-        if idx is None:
-            return None
-
-        #idx is not none, so key exists in ADT
-        self._table[idx] = self.SENTINAL
-
-    def _find(self, key: Any) -> int | None:
-        """
-        like @self.find@ but returns the idx rather than the value, if 
-        the index of the element is found, 
-        """
-        if self._loadf >  0.8:
-            self._rehash()
-
-        entry = Entry(key, value=None)
-        probe_idx = self._get_index(entry)
-        counter = 0
+        idx = -1
+        probe_idx = self._get_index(Entry(key, None))
+        counter = 1
         N = self._capacity
 
         while counter != N:
             elem = self._table[probe_idx]
 
             if elem is None:
-                return None
-
+                break
             elif elem.get_key() == key:
-                return probe_idx
-            
+                idx = probe_idx
             else:
-                probe_idx = (probe_idx + (probe_idx ** 2)) % N
+                probe_idx = (probe_idx + (counter ** 2)) % N
                 counter += 1
 
-        return None
+        if idx == -1:
+            return None
+
+        #idx is not none, so key exists in ADT
+        self._table[idx] = self.SENTINAL
+        self._active_size -= 1
 
     def find(self, key: Any) -> Any | None:
         """
@@ -182,26 +187,20 @@ class Map:
         exists; return None otherwise.
         Time complexity for full marks: O(1*)
         """
-        if self._loadf > 0.8:
-            self._rehash()
-
         # doing the most quadratic of probing 
-        entry = Entry(key, value=None)
-        probe_idx = self._get_index(entry)
-        counter = 0
+        probe_idx = self._get_index(Entry(key, value=None))
+        counter = 1
         N = self._capacity
 
         while counter != N:
             elem = self._table[probe_idx]
 
-            if elem is None:  # if the element is none or a sentinal val
+            if elem is None: 
                 return None
-
             elif elem.get_key() == key:
                 return elem.get_value()
-
-            else:
-                probe_idx = (probe_idx + (probe_idx ** 2)) % N
+            else:  # goes here if sentinal or diff elem found
+                probe_idx = (probe_idx + (counter ** 2)) % N
                 counter += 1
 
         return None
@@ -218,7 +217,7 @@ class Map:
         """
         Time complexity for full marks: O(1)
         """
-        return self._size
+        return self._active_size
 
     def is_empty(self) -> bool:
         """

@@ -170,6 +170,7 @@ class Map:
                 break
             elif elem.get_key() == key:
                 idx = probe_idx
+                break
             else:
                 probe_idx = (probe_idx + (counter ** 2)) % N
                 counter += 1
@@ -197,7 +198,7 @@ class Map:
 
             if elem is None: 
                 return None
-            elif elem.get_key() == key:
+            elif isinstance(elem, Entry) and elem.get_key() == key:
                 return elem.get_value()
             else:  # goes here if sentinal or diff elem found
                 probe_idx = (probe_idx + (counter ** 2)) % N

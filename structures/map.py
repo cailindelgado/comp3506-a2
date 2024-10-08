@@ -109,7 +109,7 @@ class Map:
         while counter != N:
             elem = self._table[probe_idx]
 
-            if elem is None or elem.get_key() == entry.get_key(): 
+            if elem is None or (isinstance(elem, Entry) and elem.get_key() == entry.get_key()): 
                 idx = probe_idx
                 break
             else:
@@ -175,12 +175,12 @@ class Map:
                 probe_idx = (probe_idx + (counter ** 2)) % N
                 counter += 1
 
-        if idx == -1:
-            return None
+        if idx != -1:
+            #idx is not none, so key exists in ADT
+            self._table[idx] = self.SENTINAL
+            self._active_size -= 1
 
-        #idx is not none, so key exists in ADT
-        self._table[idx] = self.SENTINAL
-        self._active_size -= 1
+        return None
 
     def find(self, key: Any) -> Any | None:
         """

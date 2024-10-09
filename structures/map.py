@@ -225,7 +225,7 @@ class Map:
         """
         Time complexity for full marks: O(1)
         """
-        return self._active_size
+        return self._size
 
     def is_empty(self) -> bool:
         """

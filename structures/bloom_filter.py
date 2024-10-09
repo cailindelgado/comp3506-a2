@@ -83,5 +83,4 @@ class BloomFilter:
         BitVector can currently maintain.
         Time complexity for full marks: O(1)
         """
-        return self._data._data.get_capacity() * self._data.BITS_PER_ELEMENT
-
+        pass

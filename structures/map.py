@@ -125,7 +125,8 @@ class Map:
 
         if self._table[idx] is None:
             self._table[idx] = entry
-            if not self._reseyesing:
+
+            if not self._reseyesing:  # for when resizing
                 self._size += 1
                 self._active_size += 1
                 self._loadf = self._size / self._capacity
@@ -224,10 +225,10 @@ class Map:
         """
         Time complexity for full marks: O(1)
         """
-        return self._active_size
+        return self._size
 
     def is_empty(self) -> bool:
         """
         Time complexity for full marks: O(1)
         """
-        return self._active_size == 0
+        return self._size == 0

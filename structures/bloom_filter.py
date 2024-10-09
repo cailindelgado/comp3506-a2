@@ -54,7 +54,6 @@ class BloomFilter:
         # for cyclic shifting hash
         self._mask = (1 << 32) - 1
 
-
         # should have, and allocate it accordingly.
         self._data = BitVector()
         self._data.allocate(self._bit)
@@ -77,81 +76,80 @@ class BloomFilter:
         Time complexity for full marks: O(1)
         """
         # 7 hash functions and 1 compression function
-        idx1 = self.compress_like_MAD(self.hash(key, 1))
-        idx2 = self.compress_like_MAD(self.hash(key, 2))
-        idx3 = self.compress_like_MAD(self.hash(key, 3))
-        idx4 = self.compress_like_MAD(self.hash(key, 4))
-        idx5 = self.compress_like_MAD(self.hash(key, 5))
-        idx6 = self.compress_like_MAD(self.hash(key, 6))
-        idx7 = self.compress_like_MAD(self.hash(key, 7))
-
-        self._data.set_at(idx1)
-        self._data.set_at(idx2)
-        self._data.set_at(idx3)
-        self._data.set_at(idx4)
-        self._data.set_at(idx5)
-        self._data.set_at(idx6)
-        self._data.set_at(idx7)
+        self._data.set_at(self.hash(key, 1))
+        self._data.set_at(self.hash(key, 2))
+        self._data.set_at(self.hash(key, 3))
+        self._data.set_at(self.hash(key, 4))
+        self._data.set_at(self.hash(key, 5))
+        self._data.set_at(self.hash(key, 6))
+        self._data.set_at(self.hash(key, 7))
 
         self._size += 1
 
-    def compress_like_MAD(self, hash: int) -> int:
-        """
-        takes in a hash and compresses it to be an index in the
-        bloom filters range, so it is directly indexible
-        """
-        N = self._capacity
-        prime = self._p_list[self._changing % 5]
-        return ((self._a * hash + self._b) % prime) % N
-
-    def hash(self, key: Any, option: int) -> int:
+    def hash(self, key: Any, hash_func: int) -> int:
         """
         hash function, takes in a key and convers it into a hashed
         and scrambeled output to be compressed to @self._size@
+        then uses a compression function (MAD) to compress the 
+        array down to an index to use
         """
         key = oba(key)
         hash = 0
 
-        if option == 1:
+        if hash_func == 1:
             for byte in key:
                 hash = (hash << 5 & self._mask) | (hash >> 27)
                 hash += byte
 
-        elif option == 2:
-            count = 0
+        elif hash_func == 2:
+            # count = 0
+            # for byte in key:
+            #     hash += byte * (33 ** count)
+            #     count += 1
             for byte in key:
-                hash += byte * (33 ** count)
-                count += 1
+                hash = (hash << 7 & self._mask) | (hash >> 25)
+                hash += byte
 
-        elif option == 3:
-            count = 0 
+        elif hash_func == 3:
+            # count = 0 
+            # for byte in key:
+            #     hash += byte * (37 ** count)
+            #     count += 1
             for byte in key:
-                hash += byte * (37 ** count)
-                count += 1
+                hash = (hash << 12 & self._mask) | (hash >> 20)
+                hash += byte
 
-        elif option == 4:
-            count = 0 
+        elif hash_func == 4:
+            # count = 0 
+            # for byte in key:
+            #     hash += byte * (39 ** count)
+            #     count += 1
             for byte in key:
-                hash += byte * (39 ** count)
-                count += 1
+                hash = (hash << 13 & self._mask) | (hash >> 19)
+                hash += byte
 
-        elif option == 5:
-            count = 0 
+        elif hash_func == 5:
+            # count = 0 
+            # for byte in key:
+            #     hash += byte * (41 ** count)
+            #     count += 1
             for byte in key:
-                hash += byte * (41 ** count)
-                count += 1
+                hash = (hash << 4 & self._mask) | (hash >> 28)
+                hash += byte
 
-        elif option == 6:
+        elif hash_func == 6:
             for byte in key:
                 hash = (hash << 9 & self._mask) | (hash >> 23)
                 hash += byte
 
-        elif option == 7:
+        elif hash_func == 7:
             for byte in key:
                 hash = (hash << 6 & self._mask) | (hash >> 26) 
                 hash += byte
 
-        return hash
+        N = self._capacity
+        prime = self._p_list[self._changing % 5]
+        return ((self._a * hash + self._b) % prime) % N
 
     def contains(self, key: Any) -> bool:
         """
@@ -160,21 +158,13 @@ class BloomFilter:
         Time complexity for full marks: O(1)
         """
         # bloom filter if any not 1 then no
-        idx1 = self.compress_like_MAD(self.hash(key, 1))
-        idx2 = self.compress_like_MAD(self.hash(key, 2))
-        idx3 = self.compress_like_MAD(self.hash(key, 3))
-        idx4 = self.compress_like_MAD(self.hash(key, 4))
-        idx5 = self.compress_like_MAD(self.hash(key, 5))
-        idx6 = self.compress_like_MAD(self.hash(key, 6))
-        idx7 = self.compress_like_MAD(self.hash(key, 7))
-
-        set1 = self._data.get_at(idx1)
-        set2 = self._data.get_at(idx2)
-        set3 = self._data.get_at(idx3)
-        set4 = self._data.get_at(idx4)
-        set5 = self._data.get_at(idx5)
-        set6 = self._data.get_at(idx6)
-        set7 = self._data.get_at(idx7)
+        set1 = self._data.get_at(self.hash(key, 1))
+        set2 = self._data.get_at(self.hash(key, 2))
+        set3 = self._data.get_at(self.hash(key, 3))
+        set4 = self._data.get_at(self.hash(key, 4))
+        set5 = self._data.get_at(self.hash(key, 5))
+        set6 = self._data.get_at(self.hash(key, 6))
+        set7 = self._data.get_at(self.hash(key, 7))
 
         if set1 and set2 and set3 and set4 and set5 and set6 and set7:
             return True

@@ -1,5 +1,5 @@
 # Helper libraries
-import random
+import random 
 import pytest
 
 # Importing structures
@@ -126,3 +126,32 @@ class TestMap():
         map.remove("key6")
         assert map.find("key6") is None
         assert map.find("key7") == "value7"
+
+    def test_mixed_inserts_and_removes_VAL(self, map: Map):
+        VAL = 20
+        lst = []
+        rst = []
+        size = 0
+        for i in range(300):
+            x = random.randrange(VAL)
+            side = random.randrange(2)
+            lst.append(x)
+            rst.append(side)
+
+            if side:
+                e = Entry(x, f'{i}')
+                if map.insert(e) is None:
+                    size += 1
+            else:
+                map.remove(x)
+
+
+        assert map._size == size
+
+
+
+    # what if bunch of insert and remove same key?
+
+
+
+

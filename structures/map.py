@@ -36,7 +36,7 @@ class Map:
         to initialise your map.
         """
         # resizing primes
-        self._resizing = [53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 
+        self._resizing = [53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317,
                           196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 
                           50331653, 100663319, 201326611, 402653189, 805306457, 1610612741, 
                           4294967311]  
@@ -53,6 +53,7 @@ class Map:
         self._size = 0
         self._loadf = 0.0
         self._active_size = 0
+        self._reseyesing = False
 
     def _get_index(self, entry: Entry) -> int:
         """
@@ -69,6 +70,7 @@ class Map:
         when self._loadf gets large enough it becomes time to 
         rehash the table to maintain optminal functionality
         """
+        self._reseyesing = True
         self._resize_idx += 1
         old_cap = self._capacity
 
@@ -78,18 +80,20 @@ class Map:
             self._capacity = self._resizing[self._resize_idx]
 
         # rehash the table
-        newT = [None] * self._capacity
-        for idx in range(old_cap):
-            elem = self._table[idx]
-            if isinstance(elem, Entry):
-                newT[self._get_index(elem)] = elem
-
-        self._table = newT
+        oldT = self._table
+        self._table = [None] * self._capacity
         self._loadf = self._size / self._capacity
 
         # recalculate the a and b values for hashing
         self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
         self._b = randrange(self._p_list[self._resize_idx % 5])  # b in [0, prime]
+
+        for idx in range(old_cap):
+            elem = oldT[idx]
+            if isinstance(elem, Entry):
+                self.insert(elem)
+
+        self._reseyesing = False
 
     def insert(self, entry: Entry) -> Any | None:
         """
@@ -98,7 +102,7 @@ class Map:
         None otherwise. (We will not use None as a key or a value in our tests).
         Time complexity for full marks: O(1*)
         """
-        if self._loadf >  0.8:
+        if self._loadf >=  0.8:
             self._rehash()
 
         idx = -1
@@ -121,9 +125,11 @@ class Map:
 
         if self._table[idx] is None:
             self._table[idx] = entry
-            self._size += 1
-            self._active_size += 1
-            self._loadf = self._size / self._capacity
+            if not self._reseyesing:
+                self._size += 1
+                self._active_size += 1
+                self._loadf = self._size / self._capacity
+
             return None
 
         # if index, then update val and return old val
@@ -168,7 +174,7 @@ class Map:
 
             if elem is None:
                 break
-            elif elem.get_key() == key:
+            elif isinstance(elem, Entry) and elem.get_key() == key:
                 idx = probe_idx
                 break
             else:

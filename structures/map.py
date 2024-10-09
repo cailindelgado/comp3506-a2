@@ -18,7 +18,7 @@ Note that if you opt to not use hashing, then you can simply override the
 get_hash function to return -1 for example.
 """
 
-from random import randrange
+from random import randrange as rr
 from typing import Any
 from structures.entry import Entry
 
@@ -47,8 +47,8 @@ class Map:
         # index to resize too
         self._resize_idx = 0
         self._capacity = self._resizing[self._resize_idx]
-        self._a = randrange(1, self._p_list[self._resize_idx])  # a in [1, prime]
-        self._b = randrange(self._p_list[self._resize_idx])  # b in [0, prime]
+        self._a = rr(1, self._p_list[self._resize_idx])  # a in [1, prime]
+        self._b = rr(self._p_list[self._resize_idx])  # b in [0, prime]
         self._table = [None] * self._capacity
         self._size = 0
         self._active_size = 0
@@ -73,7 +73,7 @@ class Map:
         self._resize_idx += 1
         old_cap = self._capacity
 
-        if self._resize_idx >= 26:
+        if self._resize_idx > 26:
             self._capacity = self._resizing[26]
         else:
             self._capacity = self._resizing[self._resize_idx]
@@ -83,8 +83,8 @@ class Map:
         self._table = [None] * self._capacity
 
         # recalculate the a and b values for hashing
-        self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
-        self._b = randrange(self._p_list[self._resize_idx % 5])  # b in [0, prime]
+        self._a = rr(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
+        self._b = rr(self._p_list[self._resize_idx % 5])  # b in [0, prime]
 
         for idx in range(old_cap):
             elem = oldT[idx]

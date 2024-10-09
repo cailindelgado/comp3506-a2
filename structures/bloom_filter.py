@@ -6,7 +6,9 @@ Joel Mackenzie and Vladimir Morozov
 
 from typing import Any
 from structures.bit_vector import BitVector
+from structures.util import object_to_byte_array as oba
 from math import log as ln
+from random import randrange as rr
 
 class BloomFilter:
     """
@@ -34,13 +36,31 @@ class BloomFilter:
 
     def __init__(self, max_keys: int) -> None:
         # use formula on ed discussion for number of bits: -max_keys * ln(0.01)/(ln(2)^2)
-        self._bits = -1 * max_keys * ln(0.01) / (ln(2)**2)
+        self._bits = (-1 * max_keys * ln(0.01) / (ln(2)**2))  # make next largest prime
+        self._bit_options = [97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317,
+                          196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 
+                          50331653, 100663319, 201326611, 402653189, 805306457, 1610612741, 
+                          4294967311]  
+        for i in range(25):
+            if self._bits > self._bit_options[i] and self._bits < self._bit_options[i + 1]:
+                self._bit = self._bit_options[i + 1]
+
+        # primes for the compression function
+        self._p_list = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
+        self._changing = 3
+        self._a = rr(1, self._p_list[self._changing])  # a in [1, prime]
+        self._b = rr(self._p_list[self._changing])  # b in [0, prime]
+
+        # for cyclic shifting hash
+        self._mask = (1 << 32) - 1
+
 
         # should have, and allocate it accordingly.
         self._data = BitVector()
+        self._data.allocate(self._bit)
         
         # More variables here if you need, of course
-        self._capacity = 0
+        self._capacity = self._bit
         self._size = 0
     
     def __str__(self) -> str:
@@ -49,7 +69,7 @@ class BloomFilter:
         via the str() method.
         This is not marked. <<<<
         """
-        pass
+        return "turtles"
 
     def insert(self, key: Any) -> None:
         """
@@ -57,7 +77,81 @@ class BloomFilter:
         Time complexity for full marks: O(1)
         """
         # 7 hash functions and 1 compression function
-        pass
+        idx1 = self.compress_like_MAD(self.hash(key, 1))
+        idx2 = self.compress_like_MAD(self.hash(key, 2))
+        idx3 = self.compress_like_MAD(self.hash(key, 3))
+        idx4 = self.compress_like_MAD(self.hash(key, 4))
+        idx5 = self.compress_like_MAD(self.hash(key, 5))
+        idx6 = self.compress_like_MAD(self.hash(key, 6))
+        idx7 = self.compress_like_MAD(self.hash(key, 7))
+
+        self._data.set_at(idx1)
+        self._data.set_at(idx2)
+        self._data.set_at(idx3)
+        self._data.set_at(idx4)
+        self._data.set_at(idx5)
+        self._data.set_at(idx6)
+        self._data.set_at(idx7)
+
+        self._size += 1
+
+    def compress_like_MAD(self, hash: int) -> int:
+        """
+        takes in a hash and compresses it to be an index in the
+        bloom filters range, so it is directly indexible
+        """
+        N = self._capacity
+        prime = self._p_list[self._changing % 5]
+        return ((self._a * hash + self._b) % prime) % N
+
+    def hash(self, key: Any, option: int) -> int:
+        """
+        hash function, takes in a key and convers it into a hashed
+        and scrambeled output to be compressed to @self._size@
+        """
+        key = oba(key)
+        hash = 0
+
+        if option == 1:
+            for byte in key:
+                hash = (hash << 5 & self._mask) | (hash >> 27)
+                hash += byte
+
+        elif option == 2:
+            count = 0
+            for byte in key:
+                hash += byte * (33 ** count)
+                count += 1
+
+        elif option == 3:
+            count = 0 
+            for byte in key:
+                hash += byte * (37 ** count)
+                count += 1
+
+        elif option == 4:
+            count = 0 
+            for byte in key:
+                hash += byte * (39 ** count)
+                count += 1
+
+        elif option == 5:
+            count = 0 
+            for byte in key:
+                hash += byte * (41 ** count)
+                count += 1
+
+        elif option == 6:
+            for byte in key:
+                hash = (hash << 9 & self._mask) | (hash >> 23)
+                hash += byte
+
+        elif option == 7:
+            for byte in key:
+                hash = (hash << 6 & self._mask) | (hash >> 26) 
+                hash += byte
+
+        return hash
 
     def contains(self, key: Any) -> bool:
         """
@@ -65,7 +159,27 @@ class BloomFilter:
         over k are set. False otherwise.
         Time complexity for full marks: O(1)
         """
-        pass
+        # bloom filter if any not 1 then no
+        idx1 = self.compress_like_MAD(self.hash(key, 1))
+        idx2 = self.compress_like_MAD(self.hash(key, 2))
+        idx3 = self.compress_like_MAD(self.hash(key, 3))
+        idx4 = self.compress_like_MAD(self.hash(key, 4))
+        idx5 = self.compress_like_MAD(self.hash(key, 5))
+        idx6 = self.compress_like_MAD(self.hash(key, 6))
+        idx7 = self.compress_like_MAD(self.hash(key, 7))
+
+        set1 = self._data.get_at(idx1)
+        set2 = self._data.get_at(idx2)
+        set3 = self._data.get_at(idx3)
+        set4 = self._data.get_at(idx4)
+        set5 = self._data.get_at(idx5)
+        set6 = self._data.get_at(idx6)
+        set7 = self._data.get_at(idx7)
+
+        if set1 and set2 and set3 and set4 and set5 and set6 and set7:
+            return True
+        else:
+            return False
 
     def __contains__(self, key: Any) -> bool:
         """
@@ -80,7 +194,7 @@ class BloomFilter:
         Boolean helper to tell us if the structure is empty or not
         Time complexity for full marks: O(1)
         """
-        pass
+        return self._size == 0
 
     def get_capacity(self) -> int:
         """
@@ -88,4 +202,4 @@ class BloomFilter:
         BitVector can currently maintain.
         Time complexity for full marks: O(1)
         """
-        pass
+        return self._capacity

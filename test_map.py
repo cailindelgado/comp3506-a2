@@ -1,5 +1,6 @@
 # Helper libraries
 import random 
+import time
 import pytest
 
 # Importing structures
@@ -148,9 +149,41 @@ class TestMap():
 
         assert map._size == size
 
-
-
     # what if bunch of insert and remove same key?
+
+    def test_from_Jas(self, map: Map):
+        rand_list = [random.randrange(0, 2**32 -1 ) for _ in range(50001)]
+        test_dict = {}
+
+        # print("Init done")
+        start1 = time.time()
+        for i in rand_list:
+            val = f'val{i}'
+            map.insert_kv(i, val)
+            test_dict[i] = val
+            end1 = time.time()
+            # print(end1-start1)
+
+            #assert they're the same 
+            assert map.find(i) == test_dict[i], f'mismatch for key {i}'
+
+        assert map.get_size() == len(test_dict)
+
+        for i in random.sample(rand_list, 50000):
+            # only remove if key in both 
+            if i in test_dict and map.find(i) is not None:
+                map.remove(i)
+                del test_dict[i]
+
+                assert map.find(i) is None, f'Key {i} still exists in map after removal'
+                assert i not in test_dict, f'Key {i} still exists in dict after removal'
+        
+        assert map.get_size() == len(test_dict)
+
+        print(f"dict size: {len(test_dict)}")
+        print(f"map size: {map.get_size()}, {map._capacity}, {map._loadf}")
+
+
 
 
 

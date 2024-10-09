@@ -6,6 +6,7 @@ Joel Mackenzie and Vladimir Morozov
 
 from typing import Any
 from structures.bit_vector import BitVector
+from math import log as ln
 
 class BloomFilter:
     """
@@ -32,13 +33,15 @@ class BloomFilter:
     """
 
     def __init__(self, max_keys: int) -> None:
-        # You should use max_keys to decide how many bits your bitvector
         # use formula on ed discussion for number of bits: -max_keys * ln(0.01)/(ln(2)^2)
+        self._bits = -1 * max_keys * ln(0.01) / (ln(2)**2)
 
         # should have, and allocate it accordingly.
         self._data = BitVector()
         
         # More variables here if you need, of course
+        self._capacity = 0
+        self._size = 0
     
     def __str__(self) -> str:
         """
@@ -53,6 +56,7 @@ class BloomFilter:
         Insert a key into the Bloom filter.
         Time complexity for full marks: O(1)
         """
+        # 7 hash functions and 1 compression function
         pass
 
     def contains(self, key: Any) -> bool:
@@ -69,6 +73,7 @@ class BloomFilter:
         `if key in my_bloom_filter:`
         Time complexity for full marks: O(1)
         """
+        return self.contains(key)
 
     def is_empty(self) -> bool:
         """

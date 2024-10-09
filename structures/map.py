@@ -51,7 +51,6 @@ class Map:
         self._b = randrange(self._p_list[self._resize_idx])  # b in [0, prime]
         self._table = [None] * self._capacity
         self._size = 0
-        self._loadf = 0.0
         self._active_size = 0
         self._reseyesing = False
 
@@ -82,7 +81,6 @@ class Map:
         # rehash the table
         oldT = self._table
         self._table = [None] * self._capacity
-        self._loadf = self._size / self._capacity
 
         # recalculate the a and b values for hashing
         self._a = randrange(1, self._p_list[self._resize_idx % 5])  # a in [1, prime]
@@ -102,7 +100,7 @@ class Map:
         None otherwise. (We will not use None as a key or a value in our tests).
         Time complexity for full marks: O(1*)
         """
-        if self._loadf >=  0.8:
+        if (self._size / self._capacity) >=  2/3:
             self._rehash()
 
         idx = -1
@@ -126,10 +124,9 @@ class Map:
         if self._table[idx] is None:
             self._table[idx] = entry
 
-            if not self._reseyesing:  # for when resizing
+            if not self._reseyesing:  # for when resizing/rehashing
                 self._size += 1
                 self._active_size += 1
-                self._loadf = self._size / self._capacity
 
             return None
 
@@ -225,7 +222,7 @@ class Map:
         """
         Time complexity for full marks: O(1)
         """
-        return self._size
+        return self._active_size
 
     def is_empty(self) -> bool:
         """

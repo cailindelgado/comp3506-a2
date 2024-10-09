@@ -20,7 +20,7 @@ class TestMap():
         assert map._capacity == 53
         assert map._table == [None] * 53
         assert map._size == 0
-        assert map._loadf == 0
+        assert len(map._resizing) == 27
 
     def test_index_yoinking(self, map: Map):
         e1 = Entry(1, "a")
@@ -181,10 +181,4 @@ class TestMap():
         assert map.get_size() == len(test_dict)
 
         print(f"dict size: {len(test_dict)}")
-        print(f"map size: {map.get_size()}, {map._capacity}, {map._loadf}")
-
-
-
-
-
-
+        print(f"map size: {map.get_size()}, {map._capacity}")

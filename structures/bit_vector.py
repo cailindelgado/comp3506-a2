@@ -43,6 +43,9 @@ class BitVector:
         return self.__str__()
 
     def __resize(self) -> None:
+        """
+        for resizing bloom filter
+        """
         pass
 
     def allocate(self, bits_desired: int) -> None:

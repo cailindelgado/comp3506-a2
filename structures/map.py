@@ -231,4 +231,4 @@ class Map:
         """
         Time complexity for full marks: O(1)
         """
-        return self._size == 0
+        return self._active_size == 0

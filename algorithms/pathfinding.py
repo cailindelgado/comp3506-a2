@@ -106,6 +106,3 @@ def dfs_traversal(
     # Return the path and the visited nodes list
     return (path, visited_order)
 
-
-
-

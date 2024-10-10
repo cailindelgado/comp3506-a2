@@ -79,10 +79,10 @@ class BloomFilter:
         self._data.set_at(self.hash(key, 1))
         self._data.set_at(self.hash(key, 2))
         self._data.set_at(self.hash(key, 3))
-        self._data.set_at(self.hash(key, 4))
-        self._data.set_at(self.hash(key, 5))
-        self._data.set_at(self.hash(key, 6))
-        self._data.set_at(self.hash(key, 7))
+        # self._data.set_at(self.hash(key, 4))
+        # self._data.set_at(self.hash(key, 5))
+        # self._data.set_at(self.hash(key, 6))
+        # self._data.set_at(self.hash(key, 7))
 
         self._size += 1
 
@@ -102,40 +102,28 @@ class BloomFilter:
                 hash += byte
 
         elif hash_func == 2:
-            # count = 0
-            # for byte in key:
-            #     hash += byte * (33 ** count)
-            #     count += 1
+            count = 0
             for byte in key:
-                hash = (hash << 7 & self._mask) | (hash >> 25)
-                hash += byte
+                hash += byte * (33 ** count)
+                count += 1
 
         elif hash_func == 3:
-            # count = 0 
-            # for byte in key:
-            #     hash += byte * (37 ** count)
-            #     count += 1
+            count = 0 
             for byte in key:
-                hash = (hash << 12 & self._mask) | (hash >> 20)
-                hash += byte
+                hash += byte * (37 ** count)
+                count += 1
 
         elif hash_func == 4:
-            # count = 0 
-            # for byte in key:
-            #     hash += byte * (39 ** count)
-            #     count += 1
+            count = 0 
             for byte in key:
-                hash = (hash << 13 & self._mask) | (hash >> 19)
-                hash += byte
+                hash += byte * (39 ** count)
+                count += 1
 
         elif hash_func == 5:
-            # count = 0 
-            # for byte in key:
-            #     hash += byte * (41 ** count)
-            #     count += 1
+            count = 0 
             for byte in key:
-                hash = (hash << 4 & self._mask) | (hash >> 28)
-                hash += byte
+                hash += byte * (41 ** count)
+                count += 1
 
         elif hash_func == 6:
             for byte in key:
@@ -147,6 +135,10 @@ class BloomFilter:
                 hash = (hash << 6 & self._mask) | (hash >> 26) 
                 hash += byte
 
+        # try 7 compressions instead etc..
+        # try 3 hash functions etc..
+
+        # do the MAD compression
         N = self._capacity
         prime = self._p_list[self._changing % 5]
         return ((self._a * hash + self._b) % prime) % N
@@ -161,12 +153,13 @@ class BloomFilter:
         set1 = self._data.get_at(self.hash(key, 1))
         set2 = self._data.get_at(self.hash(key, 2))
         set3 = self._data.get_at(self.hash(key, 3))
-        set4 = self._data.get_at(self.hash(key, 4))
-        set5 = self._data.get_at(self.hash(key, 5))
-        set6 = self._data.get_at(self.hash(key, 6))
-        set7 = self._data.get_at(self.hash(key, 7))
+        # set4 = self._data.get_at(self.hash(key, 4))
+        # set5 = self._data.get_at(self.hash(key, 5))
+        # set6 = self._data.get_at(self.hash(key, 6))
+        # set7 = self._data.get_at(self.hash(key, 7))
 
-        if set1 and set2 and set3 and set4 and set5 and set6 and set7:
+        # if set1 and set2 and set3 and set4 and set5 and set6 and set7:
+        if set1 and set2 and set3: 
             return True
         else:
             return False

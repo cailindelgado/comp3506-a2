@@ -69,6 +69,14 @@ def maybe_maybe_maybe(database: list[str], query: list[str]) -> list[str]:
     answer = [] 
 
     # DO THE THING
+    bf = BloomFilter(len(database))
+
+    for kmr in database:
+        bf.insert(kmr)
+
+    for kmr in query:
+        if bf.contains(kmr):
+            answer.append(kmr)
 
     return answer
 

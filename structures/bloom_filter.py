@@ -46,7 +46,7 @@ class BloomFilter:
                 self._bit = self._bit_options[i + 1]
 
         # primes for the compression function
-        self._primes = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
+        self._primes = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387, 4294967459]  
         #compression func 1
         self._a = rr(1, self._primes[0])  # a in [1, prime]
         self._b = rr(self._primes[0])  # b in [0, prime]
@@ -68,8 +68,8 @@ class BloomFilter:
         self._j = rr(self._primes[4])
 
         # compression func 6
-        self._k = rr(1, self._primes[4])
-        self._l = rr(self._primes[4])
+        self._k = rr(1, self._primes[5])
+        self._l = rr(self._primes[5])
 
         # for cyclic shifting hash
         self._mask = (1 << 32) - 1

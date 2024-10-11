@@ -8,7 +8,7 @@ problems. Or maybe not. We did it for you just in case.
 """
 from structures.entry import Entry
 from structures.dynamic_array import DynamicArray
-from structures.graph import Graph, LatticeGraph
+from structures.graph import Graph, LatticeGraph, Node
 from structures.map import Map
 from structures.pqueue import PriorityQueue
 from structures.bloom_filter import BloomFilter
@@ -34,13 +34,43 @@ def bfs_traversal(
     """
     # Stores the keys of the nodes in the order they were visited
     visited_order = DynamicArray()
+    visited_nodes = Map()
+
     # Stores the path from the origin to the goal
     path = DynamicArray()
 
     # ALGO GOES HERE
+    Q = PriorityQueue()
+    start = graph.get_node(origin)
+    end = graph.get_node(goal)
+    found = False
 
-    # Return the path and the visited nodes list
-    return (path, visited_order)
+    if start is not None and end is not None:
+        Q.insert_fifo(start)
+        visited_order.append(start.get_id())
+        visited_nodes.insert_kv(start.get_id(), 1)
+        path.append(start.get_id())
+
+        while not Q.is_empty():
+            current = Q.remove_min()
+            if current is end:
+                path.append(current.get_id())
+                found = True
+                break
+
+            for neighbor in graph.get_neighbours(current):  
+                if isinstance(neighbor, Node):
+                    if visited_nodes.find(neighbor.get_id()) is None:  # if neighbor not explored
+                        Q.insert_fifo(neighbor)
+                        visited_nodes.insert_kv(neighbor.get_id(), 1)  # mark as visited
+                        visited_order.append(neighbor.get_id())
+                    else:   # if explored route then remove current node from shortest path
+                        path.remove(current.get_id())
+
+            if found:
+                break
+
+    return (path, visited_order)   # Return the path and the visited nodes list
 
 
 def dijkstra_traversal(
@@ -105,7 +135,4 @@ def dfs_traversal(
 
     # Return the path and the visited nodes list
     return (path, visited_order)
-
-
-
 

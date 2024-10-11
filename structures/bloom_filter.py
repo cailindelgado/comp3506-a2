@@ -78,7 +78,7 @@ class BloomFilter:
         # 7 hash functions and 1 compression function
         self._data.set_at(self.hash(key, 1))
         self._data.set_at(self.hash(key, 2))
-        self._data.set_at(self.hash(key, 3))
+        # self._data.set_at(self.hash(key, 3))
         # self._data.set_at(self.hash(key, 4))
         # self._data.set_at(self.hash(key, 5))
         # self._data.set_at(self.hash(key, 6))
@@ -152,14 +152,14 @@ class BloomFilter:
         # bloom filter if any not 1 then no
         set1 = self._data.get_at(self.hash(key, 1))
         set2 = self._data.get_at(self.hash(key, 2))
-        set3 = self._data.get_at(self.hash(key, 3))
+        # set3 = self._data.get_at(self.hash(key, 3))
         # set4 = self._data.get_at(self.hash(key, 4))
         # set5 = self._data.get_at(self.hash(key, 5))
         # set6 = self._data.get_at(self.hash(key, 6))
         # set7 = self._data.get_at(self.hash(key, 7))
 
         # if set1 and set2 and set3 and set4 and set5 and set6 and set7:
-        if set1 and set2 and set3: 
+        if set1 and set2: 
             return True
         else:
             return False

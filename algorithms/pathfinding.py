@@ -31,6 +31,22 @@ def bfs_traversal(
       1. The ordered path between the origin and the goal in node IDs
       (or an empty DynamicArray if no path exists);
       2. The IDs of all nodes in the order they were visited.
+
+
+    Q = new empty queue
+    Q.enqueue(u)
+    Mark vertex u as visited
+    while not Q.isEmpty() do
+        v = Q.dequeue()
+        for all e in G.incidentEdges(v) do
+            if e is not explored then
+                w <- G.opposite(v, e)
+                if w has not been visited then
+                    Record edge e as a discovery edge for vertex w
+                    Q.enqueue(w)
+                    Mark vertex w as visited
+                else
+                    Mark e as a cross edge
     """
     # Stores the keys of the nodes in the order they were visited
     visited_order = DynamicArray()
@@ -48,11 +64,11 @@ def bfs_traversal(
     if start is not None and end is not None:
         Q.insert_fifo(start)
         visited_order.append(start.get_id())
-        visited_nodes.insert_kv(start.get_id(), 1)
-        path.append(start.get_id())
+        visited_nodes.insert_kv(start.get_id(), start.get_id())
 
         while not Q.is_empty():
             current = Q.remove_min()
+            visited_order.append(current.get_id())
             if current is end:
                 path.append(current.get_id())
                 found = True
@@ -62,13 +78,16 @@ def bfs_traversal(
                 if isinstance(neighbor, Node):
                     if visited_nodes.find(neighbor.get_id()) is None:  # if neighbor not explored
                         Q.insert_fifo(neighbor)
-                        visited_nodes.insert_kv(neighbor.get_id(), 1)  # mark as visited
-                        visited_order.append(neighbor.get_id())
-                    else:   # if explored route then remove current node from shortest path
-                        path.remove(current.get_id())
+                        visited_nodes.insert_kv(neighbor.get_id(), current.get_id())  # mark as visited
 
-            if found:
-                break
+        if found:  # reverse the list
+            current = end.get_id()
+            while current is not start.get_id():
+                current = visited_nodes.find(current)
+                path.append(current)
+
+            len = path.get_size()
+                
 
     return (path, visited_order)   # Return the path and the visited nodes list
 

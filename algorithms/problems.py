@@ -145,13 +145,13 @@ def chain_reaction(compounds: list[Compound]) -> int:
 
     Limitations:
         "It works":
-            @compounds@ has up to 100 elements
+            @compounds@ has up to 100 elements  # 10
 
         "Exhaustive":
-            @compounds@ has up to 1000 elements
+            @compounds@ has up to 1000 elements  # 50
 
         "Welcome to COMP3506":
-            @compounds@ has up to 10'000 elements
+            @compounds@ has up to 10'000 elements  # 100
 
     """
     maximal_compound = -1

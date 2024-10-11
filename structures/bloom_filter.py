@@ -46,10 +46,30 @@ class BloomFilter:
                 self._bit = self._bit_options[i + 1]
 
         # primes for the compression function
-        self._p_list = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
-        self._changing = 3
-        self._a = rr(1, self._p_list[self._changing])  # a in [1, prime]
-        self._b = rr(self._p_list[self._changing])  # b in [0, prime]
+        self._primes = [4294967311, 4294967357, 4294967371, 4294967377, 4294967387]  
+        #compression func 1
+        self._a = rr(1, self._primes[0])  # a in [1, prime]
+        self._b = rr(self._primes[0])  # b in [0, prime]
+
+        # compression func 2
+        self._c = rr(1, self._primes[1])
+        self._d = rr(self._primes[1])
+
+        # compression func 3
+        self._e = rr(1, self._primes[2])
+        self._f = rr(self._primes[2])
+
+        # compression func 4
+        self._g = rr(1, self._primes[3])
+        self._h = rr(self._primes[3])
+
+        # compression func 5
+        self._i = rr(1, self._primes[4])
+        self._j = rr(self._primes[4])
+
+        # compression func 6
+        self._k = rr(1, self._primes[4])
+        self._l = rr(self._primes[4])
 
         # for cyclic shifting hash
         self._mask = (1 << 32) - 1
@@ -75,18 +95,20 @@ class BloomFilter:
         Insert a key into the Bloom filter.
         Time complexity for full marks: O(1)
         """
-        # 7 hash functions and 1 compression function
-        self._data.set_at(self.hash(key, 1))
-        self._data.set_at(self.hash(key, 2))
-        # self._data.set_at(self.hash(key, 3))
-        # self._data.set_at(self.hash(key, 4))
-        # self._data.set_at(self.hash(key, 5))
-        # self._data.set_at(self.hash(key, 6))
-        # self._data.set_at(self.hash(key, 7))
+        # self._data.set_at(self.hash(key, 1))
+        # self._data.set_at(self.hash(key, 2))
+        hash1 = self._hash(key, 1)
+        hash2 = self._hash(key, 2)
+        self._data.set_at(self._compress(hash1, 0))
+        self._data.set_at(self._compress(hash1, 1))
+        self._data.set_at(self._compress(hash1, 2))
+        self._data.set_at(self._compress(hash2, 3))
+        self._data.set_at(self._compress(hash2, 4))
+        self._data.set_at(self._compress(hash2, 5))
 
         self._size += 1
 
-    def hash(self, key: Any, hash_func: int) -> int:
+    def _hash(self, key: Any, hash_func: int) -> int:
         """
         hash function, takes in a key and convers it into a hashed
         and scrambeled output to be compressed to @self._size@
@@ -102,46 +124,41 @@ class BloomFilter:
                 hash += byte
 
         elif hash_func == 2:
-            count = 0
-            for byte in key:
-                hash += byte * (33 ** count)
-                count += 1
-
-        elif hash_func == 3:
-            count = 0 
-            for byte in key:
-                hash += byte * (37 ** count)
-                count += 1
-
-        elif hash_func == 4:
-            count = 0 
-            for byte in key:
-                hash += byte * (39 ** count)
-                count += 1
-
-        elif hash_func == 5:
-            count = 0 
-            for byte in key:
-                hash += byte * (41 ** count)
-                count += 1
-
-        elif hash_func == 6:
             for byte in key:
                 hash = (hash << 9 & self._mask) | (hash >> 23)
                 hash += byte
 
-        elif hash_func == 7:
-            for byte in key:
-                hash = (hash << 6 & self._mask) | (hash >> 26) 
-                hash += byte
+        return hash
 
-        # try 7 compressions instead etc..
-        # try 3 hash functions etc..
-
+    def _compress(self, hash: int, compression_func: int) -> int:
+        """
+        A bunch of compression functions to distribute the hash across the bloomfilter
         # do the MAD compression
+        """
         N = self._capacity
-        prime = self._p_list[self._changing % 5]
-        return ((self._a * hash + self._b) % prime) % N
+
+        if compression_func == 0:
+            prime = self._primes[0]
+            return ((self._a * hash + self._b) % prime) % N
+
+        elif compression_func == 1:
+            prime = self._primes[1]
+            return ((self._c * hash + self._d) % prime) % N
+        
+        elif compression_func == 2:
+            prime = self._primes[2]
+            return ((self._e * hash + self._f) % prime) % N
+
+        elif compression_func == 3:
+            prime = self._primes[3]
+            return ((self._g * hash + self._h) % prime) % N
+
+        elif compression_func == 4:
+            prime = self._primes[4]
+            return ((self._i * hash + self._j) % prime) % N
+        else:
+            prime = self._primes[5]
+            return ((self._k * hash + self._l) % prime) % N
 
     def contains(self, key: Any) -> bool:
         """
@@ -150,16 +167,16 @@ class BloomFilter:
         Time complexity for full marks: O(1)
         """
         # bloom filter if any not 1 then no
-        set1 = self._data.get_at(self.hash(key, 1))
-        set2 = self._data.get_at(self.hash(key, 2))
-        # set3 = self._data.get_at(self.hash(key, 3))
-        # set4 = self._data.get_at(self.hash(key, 4))
-        # set5 = self._data.get_at(self.hash(key, 5))
-        # set6 = self._data.get_at(self.hash(key, 6))
-        # set7 = self._data.get_at(self.hash(key, 7))
+        hash1 = self._hash(key, 1)
+        hash2 = self._hash(key, 2)
+        set1 = self._data.get_at(self._compress(hash1, 0))
+        set2 = self._data.get_at(self._compress(hash1, 1))
+        set3 = self._data.get_at(self._compress(hash1, 2))
+        set4 = self._data.get_at(self._compress(hash2, 3))
+        set5 = self._data.get_at(self._compress(hash2, 4))
+        set6 = self._data.get_at(self._compress(hash2, 5))
 
-        # if set1 and set2 and set3 and set4 and set5 and set6 and set7:
-        if set1 and set2: 
+        if set1 and set2 and set3 and set4 and set5 and set6:
             return True
         else:
             return False

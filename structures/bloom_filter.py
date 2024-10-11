@@ -101,10 +101,10 @@ class BloomFilter:
         hash2 = self._hash(key, 2)
         self._data.set_at(self._compress(hash1, 0))
         self._data.set_at(self._compress(hash1, 1))
-        self._data.set_at(self._compress(hash1, 2))
+        # self._data.set_at(self._compress(hash1, 2))
         self._data.set_at(self._compress(hash2, 3))
         self._data.set_at(self._compress(hash2, 4))
-        self._data.set_at(self._compress(hash2, 5))
+        # self._data.set_at(self._compress(hash2, 5))
 
         self._size += 1
 
@@ -171,12 +171,13 @@ class BloomFilter:
         hash2 = self._hash(key, 2)
         set1 = self._data.get_at(self._compress(hash1, 0))
         set2 = self._data.get_at(self._compress(hash1, 1))
-        set3 = self._data.get_at(self._compress(hash1, 2))
+        # set3 = self._data.get_at(self._compress(hash1, 2))
         set4 = self._data.get_at(self._compress(hash2, 3))
         set5 = self._data.get_at(self._compress(hash2, 4))
-        set6 = self._data.get_at(self._compress(hash2, 5))
+        # set6 = self._data.get_at(self._compress(hash2, 5))
 
-        if set1 and set2 and set3 and set4 and set5 and set6:
+        # if set1 and set2 and set3 and set4 and set5 and set6:
+        if set1 and set2 and set4 and set5:
             return True
         else:
             return False

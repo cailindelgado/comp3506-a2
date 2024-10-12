@@ -55,7 +55,6 @@ def bfs_traversal(
     # Stores the path from the origin to the goal
     path = DynamicArray()
 
-    # ALGO GOES HERE
     Q = PriorityQueue()
     start = graph.get_node(origin)
     end = graph.get_node(goal)
@@ -63,7 +62,6 @@ def bfs_traversal(
 
     if start is not None and end is not None:
         Q.insert_fifo(start)
-        visited_order.append(start.get_id())
         visited_nodes.insert_kv(start.get_id(), start.get_id())
 
         while not Q.is_empty():
@@ -74,20 +72,30 @@ def bfs_traversal(
                 found = True
                 break
 
-            for neighbor in graph.get_neighbours(current):  
+            for neighbor in graph.get_neighbours(current.get_id()):  
                 if isinstance(neighbor, Node):
                     if visited_nodes.find(neighbor.get_id()) is None:  # if neighbor not explored
                         Q.insert_fifo(neighbor)
                         visited_nodes.insert_kv(neighbor.get_id(), current.get_id())  # mark as visited
 
-        if found:  # reverse the list
+        if found:  # if the goal has been found then create the shortest path
             current = end.get_id()
             while current is not start.get_id():
-                current = visited_nodes.find(current)
                 path.append(current)
+                current = visited_nodes.find(current)
 
+            path.append(current)
+            print(f'this is the path: {path}')
+
+            # as path has the path backwards, now to correct it
             len = path.get_size()
-                
+            lst = [0] * len
+            counter = 0
+            for i in range(len - 1, -1, -1):
+                lst[counter] = path[i]
+                counter += 1
+
+            path.build_from_list(lst)  # eat the corrected list
 
     return (path, visited_order)   # Return the path and the visited nodes list
 

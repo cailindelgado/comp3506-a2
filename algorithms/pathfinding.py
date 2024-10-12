@@ -68,7 +68,6 @@ def bfs_traversal(
             current = Q.remove_min()
             visited_order.append(current.get_id())
             if current is end:
-                path.append(current.get_id())
                 found = True
                 break
 
@@ -85,7 +84,8 @@ def bfs_traversal(
                 current = visited_nodes.find(current)
 
             path.append(current)
-            print(f'this is the path: {path}')
+
+            print(path)
 
             # as path has the path backwards, now to correct it
             len = path.get_size()

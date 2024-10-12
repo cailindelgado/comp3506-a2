@@ -72,7 +72,7 @@ def bfs_traversal(
                 found = True
                 break
 
-            for neighbor in graph.get_neighbours(current):  
+            for neighbor in graph.get_neighbours(current.get_id()):  
                 if isinstance(neighbor, Node):
                     if visited_nodes.find(neighbor.get_id()) is None:  # if neighbor not explored
                         Q.insert_fifo(neighbor)
@@ -85,12 +85,13 @@ def bfs_traversal(
                 current = visited_nodes.find(current)
 
             path.append(current)
+            print(f'this is the path: {path}')
 
             # as path has the path backwards, now to correct it
             len = path.get_size()
             lst = [0] * len
+            counter = 0
             for i in range(len - 1, -1, -1):
-                counter = 0
                 lst[counter] = path[i]
                 counter += 1
 

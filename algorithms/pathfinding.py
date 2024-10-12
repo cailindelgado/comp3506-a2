@@ -99,7 +99,6 @@ def bfs_traversal(
 
     return (path, visited_order)   # Return the path and the visited nodes list
 
-
 def dijkstra_traversal(
     graph: Graph, origin: int, goal: int
     ) -> tuple[DynamicArray, DynamicArray]:

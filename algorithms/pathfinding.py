@@ -106,13 +106,15 @@ def dijkstra_traversal(graph: Graph, origin: int) -> DynamicArray:
 
     for node in graph._nodes:
         if node.get_id() == origin:
+            # print(f'setting: @ {node.get_id()}, with 0')
             valid_locations.set_at(node.get_id(), Entry(node.get_id, 0))
         else:
+            # print(f'setting: @ {node.get_id()}, with inf')
             valid_locations.set_at(node.get_id(), Entry(node.get_id, math.inf))
 
-        inserting = valid_locations[node.get_id()].get_value()
-        if inserting is not None:
-            PQ.insert(inserting, node.get_id())  # inserts (k=distance, v=node_id)
+        insert_dist = valid_locations[node.get_id()].get_value()
+        if insert_dist is not None:
+            PQ.insert(insert_dist, node.get_id())  # inserts (k=distance, v=node_id)
 
     while not PQ.is_empty():
         current = PQ.remove_min()  # get the id of the node with the smallest weight
@@ -128,10 +130,17 @@ def dijkstra_traversal(graph: Graph, origin: int) -> DynamicArray:
                 if dist is not None:
                     new_dist = dist + weight
                 
+                    print(f'n_dist - {new_dist}, old dist - {valid_locations[neighbor.get_id()].get_value()}')
+                    print(new_dist < valid_locations[neighbor.get_id()].get_value())
                     if new_dist < valid_locations[neighbor.get_id()].get_value():
+                        print('updating')
+                        # print(f'updated node {neighbor.get_id()} from an old dist of {valid_locations[neighbor.get_id()].get_value()} to {new_dist}')
+                        print(PQ)
                         valid_locations[neighbor.get_id()] = Entry(neighbor.get_id(), new_dist)  # (vertix, dist)
-                        print(f'updated node {neighbor.get_id()} from an old dist of {valid_locations[neighbor.get_id()].get_value()} to {new_dist}')
-                        PQ.update(neighbor.get_id(), new_dist)
+                        print(str(valid_locations[neighbor.get_id()]))
+                        PQ.update(new_dist, neighbor.get_id())
+                        print(PQ)
+                print("\n")
 
     # Return the DynamicArray containing Entry types
     return valid_locations

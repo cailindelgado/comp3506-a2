@@ -215,7 +215,7 @@ class PriorityQueue:
         """
         If used makes the priority queue an adaptable priority queue
         Given a value and a key, update the key for the node with the given value
-        NOTE: Entry(key, value)
+        NEED KEY TO BE DIST AND VALUE TO BE NODE_ID
         """
         size = self.get_size()
         for entry in range(size):

@@ -33,6 +33,9 @@ class Node:
         self._id = nid
         self._data = data
 
+    def __str__(self) -> str:
+        return f'{self._id}'
+
     def get_id(self) -> int:
         return self._id
 

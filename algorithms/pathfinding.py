@@ -6,6 +6,7 @@ Joel Mackenzie and Vladimir Morozov
 You may wish to import your data structures to help you with some of the
 problems. Or maybe not. We did it for you just in case.
 """
+import math
 from structures.entry import Entry
 from structures.dynamic_array import DynamicArray
 from structures.graph import Graph, LatticeGraph, Node
@@ -31,22 +32,6 @@ def bfs_traversal(
       1. The ordered path between the origin and the goal in node IDs
       (or an empty DynamicArray if no path exists);
       2. The IDs of all nodes in the order they were visited.
-
-
-    Q = new empty queue
-    Q.enqueue(u)
-    Mark vertex u as visited
-    while not Q.isEmpty() do
-        v = Q.dequeue()
-        for all e in G.incidentEdges(v) do
-            if e is not explored then
-                w <- G.opposite(v, e)
-                if w has not been visited then
-                    Record edge e as a discovery edge for vertex w
-                    Q.enqueue(w)
-                    Mark vertex w as visited
-                else
-                    Mark e as a cross edge
     """
     # Stores the keys of the nodes in the order they were visited
     visited_order = DynamicArray()
@@ -85,8 +70,6 @@ def bfs_traversal(
 
             path.append(current)
 
-            print(path)
-
             # as path has the path backwards, now to correct it
             len = path.get_size()
             lst = [0] * len
@@ -99,37 +82,56 @@ def bfs_traversal(
 
     return (path, visited_order)   # Return the path and the visited nodes list
 
-def dijkstra_traversal(
-    graph: Graph, origin: int, goal: int
-    ) -> tuple[DynamicArray, DynamicArray]:
+def dijkstra_traversal(graph: Graph, origin: int) -> DynamicArray:
     """
     Task 2.2: Dijkstra Traversal
 
     @param: graph
       The *weighted* graph to process (POSW graphs)
     @param: origin
-      The ID of the node from which to start traversal
-    @param: goal
-      The ID of the target node
+      The ID of the node from which to start traversal.
 
-    @returns: tuple[DynamicArray, DynamicArray]
-      1. The ordered path between the origin and the goal in node IDs;
-      2. The IDs of all nodes in the order they were visited.
+    @returns: DynamicArray containing Entry types.
+      The Entry key is a node identifier, Entry value is the cost of the
+      shortest path to this node from the origin.
 
     NOTE: Dijkstra does not work (by default) on LatticeGraph types.
     This is because there is no inherent weight on an edge of these
     graphs. It should of course work where edge weights are uniform.
     """
+    valid_locations = DynamicArray() # This holds your answers
+    valid_locations.allocate(len(graph._nodes), 0)
 
-    # Stores the keys of the nodes in the order they were visited
-    visited_order = DynamicArray()
-    # Stores the path from the origin to the goal
-    path = DynamicArray()
+    PQ = PriorityQueue()
 
-    # ALGO GOES HERE
+    for node in graph._nodes:
+        if node.get_id() == origin:
+            valid_locations.set_at(node.get_id(), Entry(node.get_id, 0))
+        else:
+            valid_locations.set_at(node.get_id(), Entry(node.get_id, math.inf))
 
-    # Return the path and the visited nodes list
-    return (path, visited_order)
+        insert_dist = valid_locations[node.get_id()].get_value()
+        if insert_dist is not None:
+            PQ.insert(insert_dist, node.get_id())  # inserts (k=distance, v=node_id)
+
+    while not PQ.is_empty():
+        current = PQ.remove_min()  # get the id of the node with the smallest weight
+
+        for node_info in graph.get_neighbours(current):
+            if isinstance(node_info, tuple):
+                neighbor = node_info[0]
+                weight = node_info[1]
+
+                dist = valid_locations[current].get_value()
+                if dist is not None:
+                    new_dist = dist + weight
+                
+                    if new_dist < valid_locations[neighbor.get_id()].get_value():
+                        valid_locations[neighbor.get_id()] = Entry(neighbor.get_id(), new_dist)  # (vertix, dist)
+                        PQ.update(new_dist, neighbor.get_id())
+
+    # Return the DynamicArray containing Entry types
+    return valid_locations
 
 
 def dfs_traversal(

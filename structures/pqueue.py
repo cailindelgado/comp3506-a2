@@ -192,3 +192,36 @@ class PriorityQueue:
                     break
 
         return self._arr
+
+    def updateKey(self, old_key: Any, new_key: Any) -> None:
+        """
+        If used makes the priority queue an adaptable priority queue
+        Given a known key and a new one, find and replace the key then restore order
+        NOTE: Entry(key, value)
+        """
+        size = self.get_size()
+        found = False
+        for entry in range(size):
+            cur = self._arr[entry]
+            if isinstance(cur, Entry) and cur.get_key() == old_key:
+                cur.update_key(new_key)
+                found = True
+                break
+
+        if found:
+            self.ip_build(self._arr)
+
+    def update(self, key: Any, value: Any) -> None:
+        """
+        If used makes the priority queue an adaptable priority queue
+        Given a value and a key, update the key for the node with the given value
+        NEED KEY TO BE DIST AND VALUE TO BE NODE_ID
+        """
+        size = self.get_size()
+        for entry in range(size):
+            cur = self._arr[entry]
+            if isinstance(cur, Entry) and cur.get_value() == value:
+                cur.update_key(key)
+                self.ip_build(self._arr)
+                break
+
